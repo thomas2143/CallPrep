@@ -12,7 +12,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Debrief — AI Pre-Call Brief for CSMs">
 <meta name="twitter:description" content="Stop spending hours preparing for client calls. Paste your notes, get your brief in 30 seconds.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%236366f1'/><text y='.9em' font-size='70' x='15'>📋</text></svg>">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%236366f1'/%3E%3Cstop offset='1' stop-color='%233b82f6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='8' fill='url(%23g)'/%3E%3Ctext x='7' y='24' font-family='Georgia,serif' font-size='22' font-weight='700' fill='white'%3ED%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
 <style>
@@ -341,12 +341,19 @@ textarea::placeholder{color:var(--text-3);font-style:italic;font-family:var(--fo
 
 <div class="header">
   <div class="header-inner">
-    <div>
-      <div class="header-title">Debrief</div>
-      <div class="header-sub">AI pre-call brief · Built for CSMs</div>
-      <div class="header-badge">
-        <span class="badge-dot"></span>
-        Paste notes · Get your brief in 30 seconds
+    <div style="display:flex;align-items:center;gap:14px;">
+      <svg width="36" height="36" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;border-radius:8px;">
+        <defs><linearGradient id="dg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6366f1"/><stop offset="1" stop-color="#3b82f6"/></linearGradient></defs>
+        <rect width="32" height="32" rx="8" fill="url(#dg)"/>
+        <text x="7" y="24" font-family="Georgia,serif" font-size="22" font-weight="700" fill="white">D</text>
+      </svg>
+      <div>
+        <div class="header-title">Debrief</div>
+        <div class="header-sub">AI pre-call brief · Built for CSMs</div>
+        <div class="header-badge">
+          <span class="badge-dot"></span>
+          Paste notes · Get your brief in 30 seconds
+        </div>
       </div>
     </div>
   </div>
@@ -403,6 +410,7 @@ textarea::placeholder{color:var(--text-3);font-style:italic;font-family:var(--fo
         <div class="section-label" style="margin-bottom:0;">Your notes</div>
         <div class="notes-actions">
           <span class="saved-indicator" id="saved-indicator">✓ Saved</span>
+          <button onclick="resetNotes()" style="font-size:11px;padding:2px 8px;border-radius:var(--radius-sm);border:1px solid var(--border);background:transparent;color:var(--text-3);cursor:pointer;font-family:var(--font-heading);transition:all .15s;" onmouseover="this.style.color='var(--red-text)';this.style.borderColor='var(--red)'" onmouseout="this.style.color='var(--text-3)';this.style.borderColor='var(--border)'">✕ Clear</button>
           <span class="char-count" id="char-count">0 chars</span>
         </div>
       </div>
@@ -484,6 +492,22 @@ Example:
 
       <div id="history-strip-wrap"></div>
 
+      <div style="display:flex;gap:10px;flex-wrap:wrap;" id="post-brief-actions">
+        <button onclick="draftFollowUp()" style="font-family:var(--font-heading);font-size:13px;font-weight:500;padding:9px 18px;border-radius:var(--radius-sm);border:1px solid var(--accent-border);background:var(--accent-light);color:var(--accent);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px;" onmouseover="this.style.background='rgba(99,102,241,.25)'" onmouseout="this.style.background='var(--accent-light)'">
+          ✉️ Draft follow-up email
+        </button>
+        <button onclick="summarizeCall()" style="font-family:var(--font-heading);font-size:13px;font-weight:500;padding:9px 18px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface-2);color:var(--text-2);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px;" onmouseover="this.style.borderColor='var(--accent-border)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-2)'">
+          📝 Summarize a call transcript
+        </button>
+      </div>
+
+      <div id="extra-output" style="display:none;">
+        <div class="section-card">
+          <div class="card-title" id="extra-title">Draft</div>
+          <div id="extra-content" style="font-size:13.5px;line-height:1.8;color:var(--text-2);white-space:pre-wrap;"></div>
+        </div>
+      </div>
+
       <div class="dont-forget" id="out-dontforget">
         <div style="font-size:18px;flex-shrink:0;">⚠️</div>
         <div>
@@ -544,7 +568,14 @@ Example:
 <!-- FOOTER -->
 <div style="background:var(--surface);border-top:1px solid var(--border);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
   <div style="display:flex;align-items:center;gap:8px;">
+    <div style="display:flex;align-items:center;gap:8px;">
+    <svg width="22" height="22" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="border-radius:6px;flex-shrink:0;">
+      <defs><linearGradient id="dg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6366f1"/><stop offset="1" stop-color="#3b82f6"/></linearGradient></defs>
+      <rect width="32" height="32" rx="8" fill="url(#dg2)"/>
+      <text x="7" y="24" font-family="Georgia,serif" font-size="22" font-weight="700" fill="white">D</text>
+    </svg>
     <span style="font-family:var(--font-heading);font-size:13px;font-weight:600;color:var(--text);">Debrief</span>
+  </div>
     <span style="color:var(--border-2);">·</span>
     <span style="font-size:12px;color:var(--text-3);">Built by</span>
     <a href="https://www.linkedin.com/in/thomas-hotton" target="_blank" style="font-size:12px;font-weight:500;color:var(--accent);text-decoration:none;transition:opacity .15s;" onmouseover="this.style.opacity='.7'" onmouseout="this.style.opacity='1'">Tom Hotton</a>
@@ -558,6 +589,100 @@ Example:
 </div>
 
 <script>
+async function draftFollowUp() {
+  var btn = event.target.closest('button');
+  var origText = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner" style="border-color:rgba(99,102,241,.3);border-top-color:var(--accent);width:13px;height:13px;border-width:2px;display:inline-block;border-radius:50%;animation:spin .7s linear infinite;vertical-align:-2px;margin-right:6px;"></span> Drafting...';
+
+  var account = document.getElementById('out-account').textContent;
+  var commitments = document.getElementById('out-commitments').innerText || '';
+  var risks = document.getElementById('out-risks').innerText || '';
+  var nextSteps = document.getElementById('out-next') ? document.getElementById('out-next').innerText : '';
+  var callType = document.getElementById('f-calltype').value;
+
+  try {
+    var resp = await fetch('/api/call-prep', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        notes: 'Draft a professional follow-up email after a ' + callType + ' call with ' + account + '. Open commitments: ' + commitments + '. Risk signals: ' + risks + '. Next steps discussed: ' + nextSteps,
+        account: account,
+        callType: 'follow_up_email',
+        mode: 'email'
+      })
+    });
+    var data = await resp.json();
+    var emailText = data.dont_forget || data.account_read || '';
+
+    var resp2 = await fetch('/api/followup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ account: account, callType: callType, commitments: commitments, risks: risks, nextSteps: nextSteps })
+    });
+    var d2 = await resp2.json();
+    showExtra('Follow-up email draft — ' + account, d2.email || 'Could not generate email.');
+  } catch(e) {
+    showExtra('Error', e.message);
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = origText;
+}
+
+async function summarizeCall() {
+  var btn = event.target.closest('button');
+  var origText = btn.innerHTML;
+
+  var transcript = prompt('Paste your call transcript or notes here:');
+  if (!transcript || !transcript.trim()) return;
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner" style="border-color:rgba(255,255,255,.2);border-top-color:var(--text-2);width:13px;height:13px;border-width:2px;display:inline-block;border-radius:50%;animation:spin .7s linear infinite;vertical-align:-2px;margin-right:6px;"></span> Summarizing...';
+
+  var account = document.getElementById('f-account').value || document.getElementById('out-account').textContent || 'Account';
+
+  try {
+    var resp = await fetch('/api/call-summary', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ transcript: transcript, account: account })
+    });
+    var data = await resp.json();
+    if (data.error) throw new Error(data.error);
+    var text = 'DECISIONS MADE:\n' + (data.decisions||[]).join('\n') + '\n\nCOMMITMENTS TAKEN:\n' + (data.commitments||[]).join('\n') + '\n\nNEXT STEPS:\n' + (data.next_steps||[]).join('\n') + '\n\nKEY QUOTE:\n' + (data.key_quote||'');
+    showExtra('Call summary — ' + account, text);
+
+    var saveNote = confirm('Save this summary to ' + account + ' account history?');
+    if (saveNote) {
+      var accounts = getAccounts();
+      var key = account.toLowerCase();
+      if (accounts[key]) {
+        var today = new Date().toLocaleDateString('en-GB', {day:'numeric', month:'short', year:'numeric'});
+        accounts[key].sessions.push({ notes: transcript, date: today });
+        accounts[key].updatedAt = new Date().toISOString();
+        saveAccounts(accounts);
+        renderAccountList();
+        buildWatchlist();
+        document.getElementById('saved-indicator').classList.add('visible');
+        setTimeout(function(){ document.getElementById('saved-indicator').classList.remove('visible'); }, 2500);
+      }
+    }
+  } catch(e) {
+    showExtra('Error', e.message);
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = origText;
+}
+
+function showExtra(title, content) {
+  document.getElementById('extra-title').textContent = title;
+  document.getElementById('extra-content').textContent = content;
+  document.getElementById('extra-output').style.display = 'block';
+  document.getElementById('extra-output').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
 function submitFeedback(type) {
   const bar = document.getElementById('feedback-bar');
   const account = document.getElementById('out-account').textContent || 'unknown';
@@ -670,8 +795,8 @@ function loadAccount(key) {
   document.getElementById('f-calltype').value = acc.callType || 'QBR';
 
   // Build full notes from all sessions
-  const allNotes = (acc.sessions || []).map((s, i) => {
-    const label = s.date ? `\n--- Session ${i+1} (${s.date}) ---\n` : `\n--- Session ${i+1} ---\n`;
+  const allNotes = (acc.sessions || []).map(function(s, i) {
+    var label = s.date ? ('\n--- Session ' + (i+1) + ' (' + s.date + ') ---\n') : ('\n--- Session ' + (i+1) + ' ---\n');
     return label + s.notes;
   }).join('\n');
 
@@ -685,6 +810,14 @@ function loadAccount(key) {
   renderAccountList();
   document.getElementById('output').classList.remove('visible');
   document.getElementById('empty-state').style.display = '';
+}
+
+// ── RESET NOTES ──
+function resetNotes() {
+  document.getElementById('f-notes').value = '';
+  document.getElementById('char-count').textContent = '0 chars';
+  document.getElementById('update-banner').classList.remove('visible');
+  document.getElementById('saved-indicator').classList.remove('visible');
 }
 
 // ── NEW ACCOUNT ──
