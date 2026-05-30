@@ -219,6 +219,34 @@ textarea::placeholder{color:var(--text-3);font-style:italic;font-family:var(--fo
 }
 
 /* PRINT — A4 clean brief */
+/* WATCHLIST */
+.watchlist{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 32px;}
+.watchlist-inner{max-width:1400px;margin:0 auto;}
+.watchlist-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.watchlist-title{font-family:var(--font-heading);font-size:12px;font-weight:600;color:var(--text-3);letter-spacing:1px;text-transform:uppercase;display:flex;align-items:center;gap:8px;}
+.watchlist-refresh{font-size:11px;padding:4px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:transparent;color:var(--text-3);cursor:pointer;font-family:var(--font-heading);transition:all .15s;}
+.watchlist-refresh:hover{border-color:var(--accent-border);color:var(--accent);}
+.watchlist-empty{font-size:12px;color:var(--text-3);font-style:italic;padding:4px 0;}
+.watchlist-loading{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-3);}
+.watchlist-cards{display:flex;gap:10px;flex-wrap:wrap;}
+.wl-card{flex:1;min-width:200px;max-width:320px;padding:12px 14px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface-2);cursor:pointer;transition:all .15s;position:relative;}
+.wl-card:hover{border-color:var(--accent-border);background:var(--surface-3);}
+.wl-card.priority-high{border-left:3px solid var(--red);}
+.wl-card.priority-medium{border-left:3px solid var(--amber);}
+.wl-card.priority-low{border-left:3px solid var(--green);}
+.wl-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px;}
+.wl-card-name{font-family:var(--font-heading);font-size:13px;font-weight:600;color:var(--text);}
+.wl-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:50px;white-space:nowrap;flex-shrink:0;}
+.wl-badge.high{background:var(--red-bg);color:var(--red-text);}
+.wl-badge.medium{background:var(--amber-bg);color:var(--amber-text);}
+.wl-badge.low{background:var(--green-bg);color:var(--green-text);}
+.wl-reason{font-size:12px;color:var(--text-2);line-height:1.5;}
+.wl-action{font-size:11px;color:var(--accent);margin-top:6px;font-weight:500;}
+
+@media print{
+  .watchlist{display:none!important;}
+}
+
 @media print{
   .panel-left,.header,.onboarding-overlay{display:none!important;}
   .main{grid-template-columns:1fr;display:block;}
@@ -320,6 +348,22 @@ textarea::placeholder{color:var(--text-3);font-style:italic;font-family:var(--fo
         <span class="badge-dot"></span>
         Paste notes · Get your brief in 30 seconds
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- WATCHLIST -->
+<div class="watchlist" id="watchlist-section" style="display:none;">
+  <div class="watchlist-inner">
+    <div class="watchlist-header">
+      <div class="watchlist-title">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        Weekly watchlist
+      </div>
+      <button class="watchlist-refresh" onclick="buildWatchlist()">↻ Refresh</button>
+    </div>
+    <div id="watchlist-body">
+      <div class="watchlist-empty">Save at least one account to see your watchlist.</div>
     </div>
   </div>
 </div>
@@ -885,7 +929,71 @@ async function generate() {
 
 // ── INIT ──
 renderAccountList();
+buildWatchlist();
 
+// ── WATCHLIST ──
+async function buildWatchlist() {
+  var accounts = getAccounts();
+  var keys = Object.keys(accounts);
+  var section = document.getElementById('watchlist-section');
+  var body = document.getElementById('watchlist-body');
+
+  if (keys.length === 0) {
+    section.style.display = 'none';
+    return;
+  }
+
+  section.style.display = 'block';
+  body.innerHTML = '<div class="watchlist-loading"><span class="spinner" style="border-color:var(--border);border-top-color:var(--accent);width:12px;height:12px;border-width:2px;"></span> Analyzing your accounts...</div>';
+
+  var summaryParts = [];
+  for (var i = 0; i < keys.length; i++) {
+    var key = keys[i];
+    var acc = accounts[key];
+    var sessions = acc.sessions || [];
+    var daysSince = acc.updatedAt ? Math.floor((Date.now() - new Date(acc.updatedAt)) / (1000*60*60*24)) : 99;
+    var notesText = sessions.map(function(s){ return s.notes; }).join(' | ').slice(0, 1500);
+    summaryParts.push('ACCOUNT: ' + acc.name + ' | Sessions: ' + sessions.length + ' | Days since update: ' + daysSince + ' | NOTES: ' + notesText);
+  }
+  var accountSummaries = summaryParts.join(' --- ');
+  var today = new Date().toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+
+  try {
+    var resp = await fetch('/api/watchlist', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ accountSummaries: accountSummaries, today: today })
+    });
+
+    var data = await resp.json();
+    if (data.error) throw new Error(data.error);
+
+    var list = data.watchlist || [];
+    if (list.length === 0) {
+      body.innerHTML = '<div class="watchlist-empty">No accounts to analyze yet.</div>';
+      return;
+    }
+
+    var cards = list.map(function(item) {
+      var badge = item.priority === 'high' ? '🔴 Urgent' : item.priority === 'medium' ? '🟡 Watch' : '🟢 Healthy';
+      var div = document.createElement('div');
+      div.className = 'wl-card priority-' + item.priority;
+      div.innerHTML = '<div class="wl-card-top"><div class="wl-card-name">' + item.account + '</div><span class="wl-badge ' + item.priority + '">' + badge + '</span></div><div class="wl-reason">' + item.reason + '</div><div class="wl-action">→ ' + item.action + '</div>';
+      var accountKey = item.account.toLowerCase();
+      div.addEventListener('click', function(k){ return function(){ loadAccount(k); }; }(accountKey));
+      return div;
+    });
+
+    var wrap = document.createElement('div');
+    wrap.className = 'watchlist-cards';
+    cards.forEach(function(c){ wrap.appendChild(c); });
+    body.innerHTML = '';
+    body.appendChild(wrap);
+
+  } catch(e) {
+    body.innerHTML = '<div class="watchlist-empty">Could not analyze: ' + e.message + '</div>';
+  }
+}
 // ── ONBOARDING ──
 function obNext(current) {
   document.getElementById('ob-step-' + current).classList.remove('active');
