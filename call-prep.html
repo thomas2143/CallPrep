@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Call Prep — AI Pre-Call Brief for CSMs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blue-900:#1e3a8a;--blue-800:#1e40af;--blue-700:#1d4ed8;--blue-600:#2563eb;
+  --blue-500:#3b82f6;--blue-400:#60a5fa;--blue-100:#dbeafe;--blue-50:#eff6ff;
+  --white:#ffffff;
+  --slate-900:#0f172a;--slate-800:#1e293b;--slate-700:#334155;--slate-600:#475569;
+  --slate-500:#64748b;--slate-400:#94a3b8;--slate-300:#cbd5e1;
+  --slate-200:#e2e8f0;--slate-100:#f1f5f9;--slate-50:#f8fafc;
+  --green-700:#047857;--green-500:#10b981;--green-100:#d1fae5;--green-50:#ecfdf5;
+  --amber-700:#b45309;--amber-500:#f59e0b;--amber-100:#fef3c7;--amber-50:#fffbeb;
+  --red-700:#b91c1c;--red-500:#ef4444;--red-100:#fee2e2;--red-50:#fff5f5;
+  --purple-700:#6d28d9;--purple-500:#8b5cf6;--purple-100:#ede9fe;--purple-50:#f5f3ff;
+  --font-heading:'Outfit',sans-serif;
+  --font-body:'DM Sans',sans-serif;
+  --radius:10px;--radius-sm:6px;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 4px 16px rgba(30,64,175,.06);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--font-body);background:var(--slate-50);color:var(--slate-900);min-height:100vh;font-size:14px;}
+
+/* HEADER */
+.header{background:linear-gradient(135deg,var(--blue-900) 0%,var(--blue-800) 60%,var(--blue-700) 100%);padding:24px 32px;position:relative;overflow:hidden;}
+.header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 80% 50%,rgba(96,165,250,.15) 0%,transparent 60%);}
+.header-inner{position:relative;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.header-left{display:flex;align-items:center;gap:16px;}
+.back-btn{font-family:var(--font-heading);font-size:12px;padding:6px 12px;border-radius:var(--radius-sm);border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);cursor:pointer;text-decoration:none;transition:all .15s;}
+.back-btn:hover{background:rgba(255,255,255,.2);}
+.header-title{font-family:var(--font-heading);font-size:22px;font-weight:700;color:var(--white);letter-spacing:-.3px;}
+.header-sub{font-size:11px;color:rgba(255,255,255,.45);letter-spacing:1.2px;text-transform:uppercase;margin-top:2px;}
+.header-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:50px;padding:4px 12px;font-family:var(--font-heading);font-size:11px;color:rgba(255,255,255,.75);margin-top:6px;}
+.badge-dot{width:5px;height:5px;border-radius:50%;background:#10b981;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+
+/* LAYOUT */
+.main{display:grid;grid-template-columns:1fr 1fr;gap:0;min-height:calc(100vh - 88px);}
+.panel-left{background:var(--white);border-right:1px solid var(--slate-200);padding:28px;display:flex;flex-direction:column;gap:20px;}
+.panel-right{padding:28px;overflow-y:auto;background:var(--slate-50);}
+
+/* SECTION LABEL */
+.section-label{font-family:var(--font-heading);font-size:11px;font-weight:600;color:var(--slate-400);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:8px;}
+
+/* DEMO NOTES */
+.demo-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+.demo-chip{font-size:12px;padding:4px 12px;border-radius:50px;border:1px solid var(--slate-200);background:var(--slate-50);color:var(--slate-600);cursor:pointer;transition:all .15s;font-family:var(--font-heading);}
+.demo-chip:hover{border-color:var(--blue-400);color:var(--blue-700);background:var(--blue-50);}
+
+/* FORM */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.form-group{display:flex;flex-direction:column;gap:5px;}
+label{font-size:12px;font-weight:500;color:var(--slate-500);}
+input,select{font-family:var(--font-body);font-size:13px;padding:8px 11px;border:1px solid var(--slate-200);border-radius:var(--radius-sm);color:var(--slate-800);background:var(--white);outline:none;transition:border .15s;width:100%;}
+input:focus,select:focus{border-color:var(--blue-400);}
+
+/* TEXTAREA */
+.notes-wrap{position:relative;flex:1;display:flex;flex-direction:column;}
+.notes-label-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.char-count{font-size:11px;color:var(--slate-400);}
+textarea{font-family:var(--font-mono, 'DM Sans'),monospace;font-size:12.5px;line-height:1.7;padding:14px;border:1px solid var(--slate-200);border-radius:var(--radius);color:var(--slate-700);background:var(--slate-50);outline:none;transition:border .15s;width:100%;flex:1;min-height:320px;resize:none;}
+textarea:focus{border-color:var(--blue-400);background:var(--white);}
+textarea::placeholder{color:var(--slate-400);font-style:italic;}
+
+/* GEN BTN */
+.gen-btn{width:100%;padding:13px;font-family:var(--font-heading);font-size:15px;font-weight:600;border-radius:var(--radius);border:none;background:linear-gradient(135deg,var(--blue-700),var(--blue-600));color:white;cursor:pointer;transition:all .18s;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 14px rgba(30,64,175,.3);margin-top:16px;}
+.gen-btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 20px rgba(30,64,175,.4);}
+.gen-btn:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+.spinner{display:inline-block;width:16px;height:16px;border:2.5px solid rgba(255,255,255,.35);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* EMPTY STATE */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;min-height:400px;text-align:center;gap:10px;}
+.empty-icon{font-size:44px;opacity:.18;}
+.empty-title{font-family:var(--font-heading);font-size:17px;font-weight:600;color:var(--slate-400);}
+.empty-sub{font-size:13px;color:var(--slate-400);max-width:300px;line-height:1.65;}
+.empty-steps{display:flex;flex-direction:column;gap:8px;margin-top:8px;text-align:left;max-width:300px;}
+.empty-step{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--slate-500);}
+.empty-step-num{font-family:var(--font-heading);font-size:11px;font-weight:700;width:20px;height:20px;border-radius:50%;background:var(--slate-100);color:var(--slate-500);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+
+/* OUTPUT */
+.output{display:none;flex-direction:column;gap:20px;}
+.output.visible{display:flex;}
+
+/* BRIEF HEADER */
+.brief-head{background:var(--white);border-radius:var(--radius);border:1px solid var(--slate-200);padding:18px 20px;box-shadow:var(--shadow);}
+.brief-account{font-family:var(--font-heading);font-size:20px;font-weight:700;color:var(--slate-900);}
+.brief-meta{font-size:12px;color:var(--slate-400);margin-top:3px;}
+.brief-read{font-size:14px;line-height:1.75;color:var(--slate-700);margin-top:12px;padding-top:12px;border-top:1px solid var(--slate-100);}
+
+/* DONT FORGET */
+.dont-forget{background:var(--amber-50);border:1px solid var(--amber-100);border-left:4px solid var(--amber-500);border-radius:var(--radius);padding:14px 18px;display:flex;gap:12px;align-items:flex-start;}
+.df-icon{font-size:18px;flex-shrink:0;margin-top:1px;}
+.df-label{font-family:var(--font-heading);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--amber-700);margin-bottom:4px;}
+.df-text{font-size:13.5px;line-height:1.65;color:var(--slate-800);font-weight:500;}
+
+/* SECTION CARD */
+.section-card{background:var(--white);border-radius:var(--radius);border:1px solid var(--slate-200);padding:20px;box-shadow:var(--shadow);}
+.card-title{font-family:var(--font-heading);font-size:12px;font-weight:600;color:var(--slate-400);letter-spacing:1px;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+
+/* TIMELINE */
+.timeline{display:flex;flex-direction:column;gap:0;position:relative;}
+.timeline::before{content:'';position:absolute;left:11px;top:8px;bottom:8px;width:1px;background:var(--slate-200);}
+.tl-item{display:flex;gap:14px;align-items:flex-start;padding:8px 0;}
+.tl-dot{width:23px;height:23px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;position:relative;z-index:1;border:2px solid var(--white);}
+.tl-dot.call{background:var(--blue-100);color:var(--blue-700);}
+.tl-dot.email{background:var(--slate-100);color:var(--slate-600);}
+.tl-dot.ticket{background:var(--red-100);color:var(--red-700);}
+.tl-dot.commitment{background:var(--amber-100);color:var(--amber-700);}
+.tl-dot.win{background:var(--green-100);color:var(--green-700);}
+.tl-dot.risk{background:var(--red-100);color:var(--red-700);}
+.tl-content{flex:1;padding-bottom:8px;border-bottom:1px solid var(--slate-100);}
+.tl-item:last-child .tl-content{border-bottom:none;}
+.tl-date{font-size:11px;color:var(--slate-400);margin-bottom:2px;font-family:var(--font-heading);}
+.tl-title{font-size:13px;font-weight:500;color:var(--slate-800);margin-bottom:2px;}
+.tl-detail{font-size:12px;color:var(--slate-500);line-height:1.5;}
+.tl-flag{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:2px 8px;border-radius:50px;margin-top:4px;}
+.flag-open_commitment{background:var(--amber-100);color:var(--amber-700);}
+.flag-risk{background:var(--red-100);color:var(--red-700);}
+.flag-win{background:var(--green-100);color:var(--green-700);}
+
+/* COMMITMENTS */
+.commitments{display:flex;flex-direction:column;gap:8px;}
+.commitment-item{padding:12px 14px;border-radius:var(--radius-sm);border-left:3px solid;display:flex;flex-direction:column;gap:4px;}
+.commitment-item.overdue{background:var(--red-50);border-color:var(--red-500);}
+.commitment-item.pending{background:var(--amber-50);border-color:var(--amber-500);}
+.commitment-item.unclear{background:var(--slate-50);border-color:var(--slate-300);}
+.commitment-what{font-size:13px;font-weight:500;color:var(--slate-800);}
+.commitment-meta{font-size:11px;color:var(--slate-500);display:flex;gap:10px;flex-wrap:wrap;}
+.commitment-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:50px;align-self:flex-start;}
+.badge-overdue{background:var(--red-100);color:var(--red-700);}
+.badge-pending{background:var(--amber-100);color:var(--amber-700);}
+.badge-unclear{background:var(--slate-100);color:var(--slate-600);}
+
+/* RISKS */
+.risks{display:flex;flex-direction:column;gap:8px;}
+.risk-item{padding:12px 14px;border-radius:var(--radius-sm);background:var(--red-50);border-left:3px solid var(--red-300);}
+.risk-signal{font-size:13px;font-weight:500;color:var(--slate-800);margin-bottom:3px;}
+.risk-why{font-size:12px;color:var(--slate-600);line-height:1.5;}
+
+/* QUESTIONS */
+.questions{display:flex;flex-direction:column;gap:10px;}
+.question-item{padding:12px 14px;border-radius:var(--radius-sm);background:var(--blue-50);border-left:3px solid var(--blue-400);}
+.question-num{font-family:var(--font-heading);font-size:10px;font-weight:700;color:var(--blue-600);letter-spacing:.5px;margin-bottom:4px;}
+.question-text{font-size:13.5px;font-weight:500;color:var(--slate-800);margin-bottom:4px;line-height:1.5;}
+.question-why{font-size:12px;color:var(--slate-500);line-height:1.5;font-style:italic;}
+
+/* PRINT */
+.print-btn{font-family:var(--font-heading);font-size:12px;padding:6px 14px;border-radius:var(--radius-sm);border:1px solid var(--slate-200);background:var(--white);color:var(--slate-600);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:5px;float:right;}
+.print-btn:hover{border-color:var(--blue-400);color:var(--blue-700);}
+
+@media(max-width:900px){
+  .main{grid-template-columns:1fr;}
+  .panel-left{border-right:none;border-bottom:1px solid var(--slate-200);}
+}
+@media print{
+  .panel-left,.header{display:none!important;}
+  .main{grid-template-columns:1fr;}
+  .output{display:flex!important;}
+  body{background:white;}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="header-left">
+      <div>
+        <div class="header-title">Call Prep</div>
+        <div class="header-sub">AI Pre-Call Brief for CSMs</div>
+        <div class="header-badge">
+          <span class="badge-dot"></span>
+          Paste your notes · Get your brief in 30 seconds
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- LEFT: INPUT -->
+  <div class="panel-left">
+
+    <div>
+      <div class="section-label">Load a demo scenario</div>
+      <div class="demo-chips">
+        <span class="demo-chip" onclick="loadDemo('atrisk')">🔴 At-risk account</span>
+        <span class="demo-chip" onclick="loadDemo('expansion')">🚀 Expansion opportunity</span>
+        <span class="demo-chip" onclick="loadDemo('renewal')">🔄 Upcoming renewal</span>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Account name</label>
+        <input type="text" id="f-account" placeholder="e.g. Acme Corp" />
+      </div>
+      <div class="form-group">
+        <label>Call type</label>
+        <select id="f-calltype">
+          <option value="QBR">QBR</option>
+          <option value="Renewal">Renewal</option>
+          <option value="Check-in">Check-in</option>
+          <option value="Escalation">Escalation</option>
+          <option value="Expansion">Expansion</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="notes-wrap">
+      <div class="notes-label-row">
+        <div class="section-label" style="margin-bottom:0;">Your notes — paste everything here</div>
+        <span class="char-count" id="char-count">0 characters</span>
+      </div>
+      <textarea
+        id="f-notes"
+        placeholder="Paste everything you have on this account — call notes, emails, tickets, Slack messages, CRM entries. Dates and times help but aren't required. The messier, the better.
+
+Example:
+14 Mar — call with Sarah, she was frustrated about the slow API response times. Ticket #4421 still open.
+15 Mar — I promised to follow up before end of month.
+22 Mar — email from Sarah asking for an update. I missed it.
+2 Apr — renewal coming up in 6 weeks. Budget review happening at their end..."
+        oninput="document.getElementById('char-count').textContent=this.value.length+' characters'"
+      ></textarea>
+    </div>
+
+    <button class="gen-btn" id="gen-btn" onclick="generate()">
+      ✦ Generate Pre-Call Brief
+    </button>
+
+  </div>
+
+  <!-- RIGHT: OUTPUT -->
+  <div class="panel-right">
+
+    <div class="empty-state" id="empty-state">
+      <div class="empty-icon">📋</div>
+      <div class="empty-title">Your brief will appear here</div>
+      <div class="empty-sub">Paste your account notes on the left and click Generate.</div>
+      <div class="empty-steps">
+        <div class="empty-step">
+          <div class="empty-step-num">1</div>
+          <div>Paste your notes — call notes, emails, tickets, anything you have</div>
+        </div>
+        <div class="empty-step">
+          <div class="empty-step-num">2</div>
+          <div>Add the account name and call type</div>
+        </div>
+        <div class="empty-step">
+          <div class="empty-step-num">3</div>
+          <div>Get a structured brief with timeline, open commitments, risks, and questions to ask</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="output" id="output">
+
+      <div class="brief-head">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+          <div>
+            <div class="brief-account" id="out-account">—</div>
+            <div class="brief-meta" id="out-meta">—</div>
+          </div>
+          <button class="print-btn" onclick="window.print()">🖨 Print / PDF</button>
+        </div>
+        <div class="brief-read" id="out-read"></div>
+      </div>
+
+      <div class="dont-forget" id="out-dontforget">
+        <div class="df-icon">⚠️</div>
+        <div>
+          <div class="df-label">Don't forget</div>
+          <div class="df-text" id="out-df-text"></div>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <div class="card-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Account timeline
+        </div>
+        <div class="timeline" id="out-timeline"></div>
+      </div>
+
+      <div class="section-card" id="commitments-card">
+        <div class="card-title" style="color:var(--amber-700);">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Open commitments
+        </div>
+        <div class="commitments" id="out-commitments"></div>
+      </div>
+
+      <div class="section-card" id="risks-card">
+        <div class="card-title" style="color:var(--red-700);">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          Risk signals
+        </div>
+        <div class="risks" id="out-risks"></div>
+      </div>
+
+      <div class="section-card">
+        <div class="card-title" style="color:var(--blue-600);">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Questions to ask
+        </div>
+        <div class="questions" id="out-questions"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+const API_URL = '/api/call-prep';
+
+const demos = {
+  atrisk: {
+    account: 'Nova Corp',
+    calltype: 'QBR',
+    notes: `14 Jan — Kick-off call with Marc (VP Ops) and Julie (IT Lead). Good energy. Onboarding plan validated.
+
+28 Jan — First training session delivered to 3 teams. 22 users activated out of 94 seats. Marc said the other teams would join "in the next few weeks."
+
+15 Feb — Check-in call. Usage still at 23%. Marc says IT is blocking SSO configuration, creating friction for new users. I promised to loop in our technical team.
+
+17 Feb — Opened internal escalation with our infra team. No response yet.
+
+3 Mar — Email from Julie: SSO still not working. Two users gave up and went back to the old tool. She cc'd her CTO.
+
+10 Mar — Call with Marc. He mentioned the company is going through a restructuring. Budget review planned for Q2. He was vaguer than usual.
+
+18 Mar — I sent a follow-up email with the SSO fix instructions. No reply.
+
+2 Apr — LinkedIn: Marc has updated his profile. Looks like he may have left the company.
+
+5 Apr — Email from an unknown contact at Nova Corp, Sara Petit (Operations Manager), asking "who our main contact is." I haven't replied yet.
+
+QBR scheduled for Monday. Renewal is in 6 weeks. Current usage: 31%.`
+  },
+  expansion: {
+    account: 'Orbit Analytics',
+    calltype: 'Expansion',
+    notes: `2 Feb — Onboarding call with Lena (CEO) and Tom (Head of Data). Very engaged. They onboarded 19 users in the first week.
+
+14 Feb — Lena sent an unsolicited email saying the team loves the platform. She asked about advanced analytics features.
+
+1 Mar — Monthly check-in. DAU at 89%. Tom asked about API access to connect their data warehouse. I said I'd check pricing.
+
+3 Mar — I sent the API add-on pricing. Lena replied within 20 minutes saying it looks interesting and they'd discuss internally.
+
+15 Mar — Lena mentioned on a call that they're planning to hire 3 new data analysts in Q2. She asked if we offer volume discounts for 30+ seats. I said I'd check with my team.
+
+20 Mar — I followed up on the volume discount question. Still waiting for internal approval on our end.
+
+28 Mar — Lena posted on LinkedIn about their data stack. Mentioned our platform by name. Post got 200+ likes.
+
+5 Apr — Tom asked during a call if we support SSO. They're planning to roll out to the whole company (estimated 40-50 users). I said yes and sent the doc.
+
+Next call: Expansion discussion. Current seats: 19. Target: 40+.`
+  },
+  renewal: {
+    account: 'Brightfield Co',
+    calltype: 'Renewal',
+    notes: `Sep 15 — Annual kick-off. Paul (Head of Marketing) seemed skeptical but open. Contract value: €18,000/year. Renewal in April.
+
+Oct 3 — First training. Only 8 of 30 users showed up. Paul said people are "very busy" with a product launch.
+
+Oct 20 — Paul sent an email asking for ROI data. He said his CFO is asking questions about the subscription cost.
+
+Oct 22 — I sent a usage report. Numbers were low: 28% DAU. I tried to spin it positively but it wasn't convincing.
+
+Nov 15 — Check-in call. Paul mentioned a competitor reached out to them with a lower price. I didn't ask which one.
+
+Dec — No contact. I was on holiday. No check-in happened.
+
+Jan 10 — Email from Paul: "Are there any new features coming? We're evaluating our tools for next year." I replied with our roadmap PDF.
+
+Jan 20 — Paul replied: "Thanks. We'll be in touch."
+
+Feb — No contact. I sent one email, no reply.
+
+Mar 5 — Renewal reminder sent automatically by our system. Paul replied: "Can we have a call before we decide?"
+
+Renewal call scheduled for next week. Contract ends April 30.`
+  }
+};
+
+function loadDemo(key) {
+  const d = demos[key];
+  document.getElementById('f-account').value = d.account;
+  document.getElementById('f-calltype').value = d.calltype;
+  document.getElementById('f-notes').value = d.notes;
+  document.getElementById('char-count').textContent = d.notes.length + ' characters';
+  document.getElementById('output').classList.remove('visible');
+  document.getElementById('empty-state').style.display = '';
+}
+
+const TYPE_ICONS = {
+  call: '📞', email: '✉️', ticket: '🎫', commitment: '🤝', win: '✅', risk: '⚠️'
+};
+
+async function generate() {
+  const btn = document.getElementById('gen-btn');
+  const notes = document.getElementById('f-notes').value.trim();
+  const account = document.getElementById('f-account').value.trim();
+  const callType = document.getElementById('f-calltype').value;
+
+  if (!notes) { alert('Please paste your account notes first.'); return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Analyzing notes...';
+
+  try {
+    const resp = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ notes, account, callType })
+    });
+
+    const data = await resp.json();
+    if (data.error) throw new Error(data.error);
+
+    // Header
+    document.getElementById('out-account').textContent = data.account_name || account || 'Account';
+    document.getElementById('out-meta').textContent = `${data.call_type || callType} · Pre-call brief`;
+    document.getElementById('out-read').textContent = data.account_read || '';
+
+    // Don't forget
+    document.getElementById('out-df-text').textContent = data.dont_forget || '';
+
+    // Timeline
+    const tl = document.getElementById('out-timeline');
+    tl.innerHTML = (data.timeline || []).map(e => {
+      const dotClass = ['call','email','ticket','commitment','win','risk'].includes(e.type) ? e.type : 'email';
+      const icon = TYPE_ICONS[e.type] || '•';
+      const flagHtml = e.flag && e.flag !== 'neutral'
+        ? `<span class="tl-flag flag-${e.flag}">${e.flag === 'open_commitment' ? '⚠ open commitment' : e.flag === 'risk' ? '🔴 risk' : '✅ win'}</span>`
+        : '';
+      return `<div class="tl-item">
+        <div class="tl-dot ${dotClass}">${icon}</div>
+        <div class="tl-content">
+          <div class="tl-date">${e.date || ''}</div>
+          <div class="tl-title">${e.title || ''}</div>
+          <div class="tl-detail">${e.detail || ''}</div>
+          ${flagHtml}
+        </div>
+      </div>`;
+    }).join('');
+
+    // Open commitments
+    const oc = document.getElementById('out-commitments');
+    const commitments = data.open_commitments || [];
+    if (commitments.length === 0) {
+      document.getElementById('commitments-card').style.display = 'none';
+    } else {
+      document.getElementById('commitments-card').style.display = '';
+      oc.innerHTML = commitments.map(c => `
+        <div class="commitment-item ${c.status || 'unclear'}">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
+            <div class="commitment-what">${c.what || ''}</div>
+            <span class="commitment-badge badge-${c.status || 'unclear'}">${c.status || 'unclear'}</span>
+          </div>
+          <div class="commitment-meta">
+            ${c.promised_on ? `<span>Promised: ${c.promised_on}</span>` : ''}
+            ${c.promised_by ? `<span>By: ${c.promised_by}</span>` : ''}
+            ${c.urgency ? `<span>Urgency: ${c.urgency}</span>` : ''}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Risk signals
+    const rs = document.getElementById('out-risks');
+    const risks = data.risk_signals || [];
+    if (risks.length === 0) {
+      document.getElementById('risks-card').style.display = 'none';
+    } else {
+      document.getElementById('risks-card').style.display = '';
+      rs.innerHTML = risks.map(r => `
+        <div class="risk-item">
+          <div class="risk-signal">${r.signal || ''}</div>
+          <div class="risk-why">${r.why_it_matters || ''}</div>
+        </div>
+      `).join('');
+    }
+
+    // Questions
+    document.getElementById('out-questions').innerHTML = (data.questions_to_ask || []).map((q, i) => `
+      <div class="question-item">
+        <div class="question-num">Question ${i + 1}</div>
+        <div class="question-text">"${q.question || ''}"</div>
+        <div class="question-why">${q.why || ''}</div>
+      </div>
+    `).join('');
+
+    document.getElementById('empty-state').style.display = 'none';
+    document.getElementById('output').classList.add('visible');
+    document.getElementById('output').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  } catch(e) {
+    alert('Failed to generate brief: ' + e.message);
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '✦ Generate Pre-Call Brief';
+}
+</script>
+</body>
+</html>
