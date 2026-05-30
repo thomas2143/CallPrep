@@ -17,7 +17,7 @@
   --green-700:#047857;--green-500:#10b981;--green-100:#d1fae5;--green-50:#ecfdf5;
   --amber-700:#b45309;--amber-500:#f59e0b;--amber-100:#fef3c7;--amber-50:#fffbeb;
   --red-700:#b91c1c;--red-500:#ef4444;--red-100:#fee2e2;--red-50:#fff5f5;
-  --purple-700:#6d28d9;--purple-500:#8b5cf6;--purple-100:#ede9fe;--purple-50:#f5f3ff;
+  --purple-700:#6d28d9;--purple-100:#ede9fe;--purple-50:#f5f3ff;
   --font-heading:'Outfit',sans-serif;
   --font-body:'DM Sans',sans-serif;
   --radius:10px;--radius-sm:6px;
@@ -30,9 +30,6 @@ body{font-family:var(--font-body);background:var(--slate-50);color:var(--slate-9
 .header{background:linear-gradient(135deg,var(--blue-900) 0%,var(--blue-800) 60%,var(--blue-700) 100%);padding:24px 32px;position:relative;overflow:hidden;}
 .header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 80% 50%,rgba(96,165,250,.15) 0%,transparent 60%);}
 .header-inner{position:relative;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
-.header-left{display:flex;align-items:center;gap:16px;}
-.back-btn{font-family:var(--font-heading);font-size:12px;padding:6px 12px;border-radius:var(--radius-sm);border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);cursor:pointer;text-decoration:none;transition:all .15s;}
-.back-btn:hover{background:rgba(255,255,255,.2);}
 .header-title{font-family:var(--font-heading);font-size:22px;font-weight:700;color:var(--white);letter-spacing:-.3px;}
 .header-sub{font-size:11px;color:rgba(255,255,255,.45);letter-spacing:1.2px;text-transform:uppercase;margin-top:2px;}
 .header-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:50px;padding:4px 12px;font-family:var(--font-heading);font-size:11px;color:rgba(255,255,255,.75);margin-top:6px;}
@@ -40,38 +37,61 @@ body{font-family:var(--font-body);background:var(--slate-50);color:var(--slate-9
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
 
 /* LAYOUT */
-.main{display:grid;grid-template-columns:1fr 1fr;gap:0;min-height:calc(100vh - 88px);}
-.panel-left{background:var(--white);border-right:1px solid var(--slate-200);padding:28px;display:flex;flex-direction:column;gap:20px;}
+.main{display:grid;grid-template-columns:380px 1fr;gap:0;min-height:calc(100vh - 88px);}
+.panel-left{background:var(--white);border-right:1px solid var(--slate-200);padding:24px;display:flex;flex-direction:column;gap:18px;overflow-y:auto;}
 .panel-right{padding:28px;overflow-y:auto;background:var(--slate-50);}
 
-/* SECTION LABEL */
 .section-label{font-family:var(--font-heading);font-size:11px;font-weight:600;color:var(--slate-400);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:8px;}
+.divider{border:none;border-top:1px solid var(--slate-100);margin:2px 0;}
 
-/* DEMO NOTES */
-.demo-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+/* SAVED ACCOUNTS */
+.accounts-list{display:flex;flex-direction:column;gap:6px;}
+.account-item{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:var(--radius-sm);border:1px solid var(--slate-200);background:var(--slate-50);cursor:pointer;transition:all .15s;}
+.account-item:hover{border-color:var(--blue-400);background:var(--blue-50);}
+.account-item.active{border-color:var(--blue-500);background:var(--blue-50);}
+.account-item-info{flex:1;min-width:0;}
+.account-item-name{font-size:13px;font-weight:500;color:var(--slate-800);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.account-item-meta{font-size:11px;color:var(--slate-400);margin-top:1px;}
+.account-item-delete{width:22px;height:22px;border-radius:4px;border:none;background:transparent;color:var(--slate-300);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;transition:all .15s;}
+.account-item-delete:hover{background:var(--red-50);color:var(--red-500);}
+.new-account-btn{width:100%;padding:8px;border-radius:var(--radius-sm);border:1px dashed var(--slate-300);background:transparent;color:var(--slate-500);font-family:var(--font-heading);font-size:12px;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px;}
+.new-account-btn:hover{border-color:var(--blue-400);color:var(--blue-600);background:var(--blue-50);}
+.no-accounts{font-size:12px;color:var(--slate-400);text-align:center;padding:12px 0;font-style:italic;}
+
+/* DEMO CHIPS */
+.demo-chips{display:flex;gap:6px;flex-wrap:wrap;}
 .demo-chip{font-size:12px;padding:4px 12px;border-radius:50px;border:1px solid var(--slate-200);background:var(--slate-50);color:var(--slate-600);cursor:pointer;transition:all .15s;font-family:var(--font-heading);}
 .demo-chip:hover{border-color:var(--blue-400);color:var(--blue-700);background:var(--blue-50);}
 
 /* FORM */
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .form-group{display:flex;flex-direction:column;gap:5px;}
 label{font-size:12px;font-weight:500;color:var(--slate-500);}
 input,select{font-family:var(--font-body);font-size:13px;padding:8px 11px;border:1px solid var(--slate-200);border-radius:var(--radius-sm);color:var(--slate-800);background:var(--white);outline:none;transition:border .15s;width:100%;}
 input:focus,select:focus{border-color:var(--blue-400);}
 
-/* TEXTAREA */
-.notes-wrap{position:relative;flex:1;display:flex;flex-direction:column;}
+/* NOTES */
 .notes-label-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
 .char-count{font-size:11px;color:var(--slate-400);}
-textarea{font-family:var(--font-mono, 'DM Sans'),monospace;font-size:12.5px;line-height:1.7;padding:14px;border:1px solid var(--slate-200);border-radius:var(--radius);color:var(--slate-700);background:var(--slate-50);outline:none;transition:border .15s;width:100%;flex:1;min-height:320px;resize:none;}
+.notes-actions{display:flex;gap:6px;align-items:center;}
+.save-btn{font-size:11px;padding:3px 10px;border-radius:var(--radius-sm);border:1px solid var(--green-500);background:var(--green-50);color:var(--green-700);cursor:pointer;font-family:var(--font-heading);font-weight:600;transition:all .15s;}
+.save-btn:hover{background:var(--green-100);}
+.saved-indicator{font-size:11px;color:var(--green-600);display:none;align-items:center;gap:4px;}
+.saved-indicator.visible{display:flex;}
+textarea{font-family:monospace;font-size:12.5px;line-height:1.7;padding:14px;border:1px solid var(--slate-200);border-radius:var(--radius);color:var(--slate-700);background:var(--slate-50);outline:none;transition:border .15s;width:100%;min-height:260px;resize:none;}
 textarea:focus{border-color:var(--blue-400);background:var(--white);}
-textarea::placeholder{color:var(--slate-400);font-style:italic;}
+textarea::placeholder{color:var(--slate-400);font-style:italic;font-family:var(--font-body);}
+
+/* UPDATE BANNER */
+.update-banner{display:none;background:var(--amber-50);border:1px solid var(--amber-200);border-radius:var(--radius-sm);padding:10px 14px;font-size:12px;color:var(--amber-700);align-items:center;gap:8px;}
+.update-banner.visible{display:flex;}
+.update-banner strong{font-weight:600;}
 
 /* GEN BTN */
-.gen-btn{width:100%;padding:13px;font-family:var(--font-heading);font-size:15px;font-weight:600;border-radius:var(--radius);border:none;background:linear-gradient(135deg,var(--blue-700),var(--blue-600));color:white;cursor:pointer;transition:all .18s;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 14px rgba(30,64,175,.3);margin-top:16px;}
+.gen-btn{width:100%;padding:12px;font-family:var(--font-heading);font-size:14px;font-weight:600;border-radius:var(--radius);border:none;background:linear-gradient(135deg,var(--blue-700),var(--blue-600));color:white;cursor:pointer;transition:all .18s;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 14px rgba(30,64,175,.3);}
 .gen-btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 20px rgba(30,64,175,.4);}
 .gen-btn:disabled{opacity:.6;cursor:not-allowed;transform:none;}
-.spinner{display:inline-block;width:16px;height:16px;border:2.5px solid rgba(255,255,255,.35);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;}
+.spinner{display:inline-block;width:15px;height:15px;border:2.5px solid rgba(255,255,255,.35);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* EMPTY STATE */
@@ -86,16 +106,24 @@ textarea::placeholder{color:var(--slate-400);font-style:italic;}
 /* OUTPUT */
 .output{display:none;flex-direction:column;gap:20px;}
 .output.visible{display:flex;}
-
-/* BRIEF HEADER */
 .brief-head{background:var(--white);border-radius:var(--radius);border:1px solid var(--slate-200);padding:18px 20px;box-shadow:var(--shadow);}
 .brief-account{font-family:var(--font-heading);font-size:20px;font-weight:700;color:var(--slate-900);}
 .brief-meta{font-size:12px;color:var(--slate-400);margin-top:3px;}
 .brief-read{font-size:14px;line-height:1.75;color:var(--slate-700);margin-top:12px;padding-top:12px;border-top:1px solid var(--slate-100);}
+.print-btn{font-family:var(--font-heading);font-size:12px;padding:6px 14px;border-radius:var(--radius-sm);border:1px solid var(--slate-200);background:var(--white);color:var(--slate-600);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:5px;flex-shrink:0;}
+.print-btn:hover{border-color:var(--blue-400);color:var(--blue-700);}
+
+/* HISTORY STRIP */
+.history-strip{background:var(--white);border-radius:var(--radius);border:1px solid var(--slate-200);padding:14px 18px;box-shadow:var(--shadow);}
+.history-title{font-family:var(--font-heading);font-size:11px;font-weight:600;color:var(--slate-400);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;}
+.history-items{display:flex;flex-direction:column;gap:6px;}
+.history-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:var(--radius-sm);background:var(--slate-50);border:1px solid var(--slate-100);}
+.history-date{font-size:11px;color:var(--slate-400);font-family:var(--font-heading);white-space:nowrap;}
+.history-label{font-size:12px;color:var(--slate-600);flex:1;}
+.history-count{font-size:11px;color:var(--slate-400);}
 
 /* DONT FORGET */
 .dont-forget{background:var(--amber-50);border:1px solid var(--amber-100);border-left:4px solid var(--amber-500);border-radius:var(--radius);padding:14px 18px;display:flex;gap:12px;align-items:flex-start;}
-.df-icon{font-size:18px;flex-shrink:0;margin-top:1px;}
 .df-label{font-family:var(--font-heading);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--amber-700);margin-bottom:4px;}
 .df-text{font-size:13.5px;line-height:1.65;color:var(--slate-800);font-weight:500;}
 
@@ -150,34 +178,133 @@ textarea::placeholder{color:var(--slate-400);font-style:italic;}
 .question-text{font-size:13.5px;font-weight:500;color:var(--slate-800);margin-bottom:4px;line-height:1.5;}
 .question-why{font-size:12px;color:var(--slate-500);line-height:1.5;font-style:italic;}
 
-/* PRINT */
-.print-btn{font-family:var(--font-heading);font-size:12px;padding:6px 14px;border-radius:var(--radius-sm);border:1px solid var(--slate-200);background:var(--white);color:var(--slate-600);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:5px;float:right;}
-.print-btn:hover{border-color:var(--blue-400);color:var(--blue-700);}
+/* ONBOARDING OVERLAY */
+.onboarding-overlay{position:fixed;inset:0;background:rgba(15,23,42,.7);z-index:100;display:flex;align-items:center;justify-content:center;padding:24px;}
+.onboarding-overlay.hidden{display:none;}
+.onboarding-card{background:var(--white);border-radius:16px;padding:36px 40px;max-width:480px;width:100%;box-shadow:0 24px 64px rgba(0,0,0,.25);}
+.onboarding-step{display:none;}
+.onboarding-step.active{display:block;}
+.ob-eyebrow{font-family:var(--font-heading);font-size:11px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--blue-500);margin-bottom:10px;}
+.ob-title{font-family:var(--font-heading);font-size:22px;font-weight:700;color:var(--slate-900);margin-bottom:8px;line-height:1.3;}
+.ob-sub{font-size:14px;color:var(--slate-500);line-height:1.7;margin-bottom:24px;}
+.ob-highlight{background:var(--blue-50);border-left:3px solid var(--blue-400);border-radius:var(--radius-sm);padding:12px 16px;margin-bottom:24px;}
+.ob-highlight-text{font-size:13px;color:var(--slate-700);line-height:1.65;font-style:italic;}
+.ob-steps{display:flex;flex-direction:column;gap:12px;margin-bottom:28px;}
+.ob-step-item{display:flex;gap:12px;align-items:flex-start;}
+.ob-step-num{width:26px;height:26px;border-radius:50%;background:var(--blue-100);color:var(--blue-700);font-family:var(--font-heading);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.ob-step-text{font-size:13px;color:var(--slate-700);line-height:1.6;}
+.ob-step-text strong{font-weight:600;color:var(--slate-900);}
+.ob-btn{width:100%;padding:13px;font-family:var(--font-heading);font-size:14px;font-weight:600;border-radius:var(--radius);border:none;background:linear-gradient(135deg,var(--blue-700),var(--blue-600));color:white;cursor:pointer;transition:all .18s;box-shadow:0 4px 14px rgba(30,64,175,.3);}
+.ob-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(30,64,175,.4);}
+.ob-skip{display:block;text-align:center;margin-top:12px;font-size:12px;color:var(--slate-400);cursor:pointer;transition:color .15s;}
+.ob-skip:hover{color:var(--slate-600);}
 
 @media(max-width:900px){
   .main{grid-template-columns:1fr;}
   .panel-left{border-right:none;border-bottom:1px solid var(--slate-200);}
 }
+
+/* PRINT — A4 clean brief */
 @media print{
-  .panel-left,.header{display:none!important;}
-  .main{grid-template-columns:1fr;}
-  .output{display:flex!important;}
-  body{background:white;}
+  .panel-left,.header,.onboarding-overlay{display:none!important;}
+  .main{grid-template-columns:1fr;display:block;}
+  .panel-right{padding:0;}
+  .output{display:flex!important;flex-direction:column;gap:16px;}
+  body{background:white;font-size:12px;}
+
+  /* Print header */
+  .print-header{display:block!important;border-bottom:2px solid #1e3a8a;padding-bottom:14px;margin-bottom:20px;}
+  .print-header-top{display:flex;justify-content:space-between;align-items:flex-start;}
+  .print-logo{font-family:'Outfit',sans-serif;font-size:18px;font-weight:700;color:#1e3a8a;letter-spacing:-.3px;}
+  .print-logo span{font-size:11px;font-weight:400;color:#64748b;display:block;letter-spacing:1px;text-transform:uppercase;margin-top:2px;}
+  .print-date{font-size:11px;color:#64748b;text-align:right;}
+
+  .brief-head{box-shadow:none;border:1px solid #e2e8f0;page-break-inside:avoid;}
+  .section-card{box-shadow:none;border:1px solid #e2e8f0;page-break-inside:avoid;margin-bottom:12px;}
+  .dont-forget{page-break-inside:avoid;}
+  .history-strip{box-shadow:none;border:1px solid #e2e8f0;}
+  .print-btn{display:none!important;}
+
+  .tl-item{page-break-inside:avoid;}
+  .commitment-item{page-break-inside:avoid;}
+  .risk-item{page-break-inside:avoid;}
+  .question-item{page-break-inside:avoid;}
+
+  @page{margin:18mm 18mm 18mm 18mm;size:A4;}
 }
 </style>
 </head>
 <body>
 
+<!-- ONBOARDING OVERLAY -->
+<div class="onboarding-overlay" id="onboarding-overlay">
+  <div class="onboarding-card">
+    <div class="onboarding-step active" id="ob-step-1">
+      <div class="ob-eyebrow">Welcome to Call Prep</div>
+      <div class="ob-title">Stop spending hours preparing for client calls.</div>
+      <div class="ob-sub">Paste your raw notes — emails, call logs, tickets — and get a structured brief in 30 seconds.</div>
+      <div class="ob-highlight">
+        <div class="ob-highlight-text">"CSMs spend 8+ hours reconstructing account history before a QBR. Call Prep does it in 30 seconds."</div>
+      </div>
+      <button class="ob-btn" onclick="obNext(1)">Show me how it works →</button>
+      <span class="ob-skip" onclick="obSkip()">Skip intro</span>
+    </div>
+    <div class="onboarding-step" id="ob-step-2">
+      <div class="ob-eyebrow">How it works — 3 steps</div>
+      <div class="ob-title">Paste chaos. Get clarity.</div>
+      <div class="ob-steps">
+        <div class="ob-step-item">
+          <div class="ob-step-num">1</div>
+          <div class="ob-step-text"><strong>Paste everything you have</strong> — call notes, emails, tickets, Slack messages. No formatting needed.</div>
+        </div>
+        <div class="ob-step-item">
+          <div class="ob-step-num">2</div>
+          <div class="ob-step-text"><strong>Click Generate</strong> — the AI extracts key events, flags open commitments, and identifies risk signals you might have missed.</div>
+        </div>
+        <div class="ob-step-item">
+          <div class="ob-step-num">3</div>
+          <div class="ob-step-text"><strong>Walk in prepared</strong> — timeline, open commitments, risks, questions to ask. Print it or open on your phone 5 minutes before the call.</div>
+        </div>
+      </div>
+      <button class="ob-btn" onclick="obNext(2)">One more thing →</button>
+      <span class="ob-skip" onclick="obSkip()">Skip and start blank</span>
+    </div>
+    <div class="onboarding-step" id="ob-step-3">
+      <div class="ob-eyebrow">Pro tip</div>
+      <div class="ob-title">Your accounts are saved between visits.</div>
+      <div class="ob-sub">Click "Save account" after generating. Next quarter, open the same account, add new notes — the AI sees the full history and gives you a richer brief each time.</div>
+      <div class="ob-steps">
+        <div class="ob-step-item">
+          <div class="ob-step-num">💾</div>
+          <div class="ob-step-text">Notes saved in your browser — nothing leaves your device.</div>
+        </div>
+        <div class="ob-step-item">
+          <div class="ob-step-num">📈</div>
+          <div class="ob-step-text">The more sessions you add, the smarter the brief gets.</div>
+        </div>
+      </div>
+      <button class="ob-btn" onclick="obFinish('atrisk')">Load the at-risk demo →</button>
+      <span class="ob-skip" onclick="obSkip()">Start blank</span>
+    </div>
+  </div>
+</div>
+
+<!-- PRINT HEADER — hidden on screen, visible on print -->
+<div class="print-header" style="display:none;" id="print-header">
+  <div class="print-header-top">
+    <div class="print-logo">Call Prep <span>AI Pre-Call Brief · call-prep-uokh.vercel.app</span></div>
+    <div class="print-date" id="print-date"></div>
+  </div>
+</div>
+
 <div class="header">
   <div class="header-inner">
-    <div class="header-left">
-      <div>
-        <div class="header-title">Call Prep</div>
-        <div class="header-sub">AI Pre-Call Brief for CSMs</div>
-        <div class="header-badge">
-          <span class="badge-dot"></span>
-          Paste your notes · Get your brief in 30 seconds
-        </div>
+    <div>
+      <div class="header-title">Call Prep</div>
+      <div class="header-sub">AI Pre-Call Brief for CSMs</div>
+      <div class="header-badge">
+        <span class="badge-dot"></span>
+        Paste your notes · Get your brief in 30 seconds
       </div>
     </div>
   </div>
@@ -185,22 +312,40 @@ textarea::placeholder{color:var(--slate-400);font-style:italic;}
 
 <div class="main">
 
-  <!-- LEFT: INPUT -->
+  <!-- LEFT PANEL -->
   <div class="panel-left">
 
+    <!-- SAVED ACCOUNTS -->
     <div>
-      <div class="section-label">Load a demo scenario</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <div class="section-label" style="margin-bottom:0;">Your accounts</div>
+        <span style="font-size:11px;color:var(--slate-400);" id="accounts-count"></span>
+      </div>
+      <div class="accounts-list" id="accounts-list">
+        <div class="no-accounts" id="no-accounts">No saved accounts yet</div>
+      </div>
+      <button class="new-account-btn" style="margin-top:8px;" onclick="newAccount()">+ New account</button>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- DEMO -->
+    <div>
+      <div class="section-label">Load a demo</div>
       <div class="demo-chips">
-        <span class="demo-chip" onclick="loadDemo('atrisk')">🔴 At-risk account</span>
-        <span class="demo-chip" onclick="loadDemo('expansion')">🚀 Expansion opportunity</span>
-        <span class="demo-chip" onclick="loadDemo('renewal')">🔄 Upcoming renewal</span>
+        <span class="demo-chip" onclick="loadDemo('atrisk')">🔴 At-risk</span>
+        <span class="demo-chip" onclick="loadDemo('expansion')">🚀 Expansion</span>
+        <span class="demo-chip" onclick="loadDemo('renewal')">🔄 Renewal</span>
       </div>
     </div>
 
+    <div class="divider"></div>
+
+    <!-- FORM -->
     <div class="form-row">
       <div class="form-group">
         <label>Account name</label>
-        <input type="text" id="f-account" placeholder="e.g. Acme Corp" />
+        <input type="text" id="f-account" placeholder="e.g. Acme Corp" oninput="onAccountNameChange()" />
       </div>
       <div class="form-group">
         <label>Call type</label>
@@ -214,22 +359,34 @@ textarea::placeholder{color:var(--slate-400);font-style:italic;}
       </div>
     </div>
 
-    <div class="notes-wrap">
+    <!-- UPDATE BANNER -->
+    <div class="update-banner" id="update-banner">
+      <span>📎</span>
+      <span>Previous notes loaded. <strong>Add new notes below</strong> — the AI will analyze the full history.</span>
+    </div>
+
+    <!-- NOTES -->
+    <div style="display:flex;flex-direction:column;flex:1;">
       <div class="notes-label-row">
-        <div class="section-label" style="margin-bottom:0;">Your notes — paste everything here</div>
-        <span class="char-count" id="char-count">0 characters</span>
+        <div class="section-label" style="margin-bottom:0;">Notes — paste everything here</div>
+        <div class="notes-actions">
+          <span class="saved-indicator" id="saved-indicator">✓ Saved</span>
+          <span class="char-count" id="char-count">0 chars</span>
+        </div>
       </div>
       <textarea
         id="f-notes"
-        placeholder="Paste everything you have on this account — call notes, emails, tickets, Slack messages, CRM entries. Dates and times help but aren't required. The messier, the better.
+        placeholder="Paste everything you have — call notes, emails, tickets, Slack messages. Dates help but aren't required. The messier, the better.
 
 Example:
-14 Mar — call with Sarah, she was frustrated about the slow API response times. Ticket #4421 still open.
+14 Mar — call with Sarah, frustrated about slow API.
 15 Mar — I promised to follow up before end of month.
-22 Mar — email from Sarah asking for an update. I missed it.
-2 Apr — renewal coming up in 6 weeks. Budget review happening at their end..."
-        oninput="document.getElementById('char-count').textContent=this.value.length+' characters'"
+22 Mar — email from Sarah, no reply from me yet..."
+        oninput="onNotesChange()"
       ></textarea>
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <button class="save-btn" onclick="saveCurrentAccount()" style="flex:1;padding:8px;">💾 Save account</button>
+      </div>
     </div>
 
     <button class="gen-btn" id="gen-btn" onclick="generate()">
@@ -238,26 +395,17 @@ Example:
 
   </div>
 
-  <!-- RIGHT: OUTPUT -->
+  <!-- RIGHT PANEL -->
   <div class="panel-right">
 
     <div class="empty-state" id="empty-state">
       <div class="empty-icon">📋</div>
       <div class="empty-title">Your brief will appear here</div>
-      <div class="empty-sub">Paste your account notes on the left and click Generate.</div>
+      <div class="empty-sub">Paste your account notes and click Generate — or save an account to build its history over time.</div>
       <div class="empty-steps">
-        <div class="empty-step">
-          <div class="empty-step-num">1</div>
-          <div>Paste your notes — call notes, emails, tickets, anything you have</div>
-        </div>
-        <div class="empty-step">
-          <div class="empty-step-num">2</div>
-          <div>Add the account name and call type</div>
-        </div>
-        <div class="empty-step">
-          <div class="empty-step-num">3</div>
-          <div>Get a structured brief with timeline, open commitments, risks, and questions to ask</div>
-        </div>
+        <div class="empty-step"><div class="empty-step-num">1</div><div>Paste notes — calls, emails, tickets, anything</div></div>
+        <div class="empty-step"><div class="empty-step-num">2</div><div>Save the account to keep its history</div></div>
+        <div class="empty-step"><div class="empty-step-num">3</div><div>Next quarter, add new notes — the AI sees the full picture</div></div>
       </div>
     </div>
 
@@ -274,8 +422,10 @@ Example:
         <div class="brief-read" id="out-read"></div>
       </div>
 
+      <div id="history-strip-wrap"></div>
+
       <div class="dont-forget" id="out-dontforget">
-        <div class="df-icon">⚠️</div>
+        <div style="font-size:18px;flex-shrink:0;">⚠️</div>
         <div>
           <div class="df-label">Don't forget</div>
           <div class="df-text" id="out-df-text"></div>
@@ -320,76 +470,181 @@ Example:
 
 <script>
 const API_URL = '/api/call-prep';
+const STORAGE_KEY = 'callprep_accounts';
+const TYPE_ICONS = {call:'📞',email:'✉️',ticket:'🎫',commitment:'🤝',win:'✅',risk:'⚠️'};
 
+// ── STORAGE ──
+function getAccounts() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch(e) { return {}; }
+}
+function saveAccounts(data) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+// ── RENDER ACCOUNT LIST ──
+function renderAccountList() {
+  const accounts = getAccounts();
+  const list = document.getElementById('accounts-list');
+  const noAccounts = document.getElementById('no-accounts');
+  const keys = Object.keys(accounts);
+  document.getElementById('accounts-count').textContent = keys.length ? `${keys.length} saved` : '';
+
+  if (keys.length === 0) {
+    list.innerHTML = '<div class="no-accounts" id="no-accounts">No saved accounts yet</div>';
+    return;
+  }
+
+  const currentName = document.getElementById('f-account').value.trim().toLowerCase();
+  list.innerHTML = keys.map(key => {
+    const acc = accounts[key];
+    const isActive = key === currentName;
+    const lastUpdated = acc.updatedAt ? new Date(acc.updatedAt).toLocaleDateString('en-GB', {day:'numeric',month:'short'}) : '';
+    const noteCount = acc.sessions ? acc.sessions.length : 0;
+    return `<div class="account-item ${isActive ? 'active' : ''}" onclick="loadAccount('${key}')">
+      <div class="account-item-info">
+        <div class="account-item-name">${acc.name}</div>
+        <div class="account-item-meta">${noteCount} session${noteCount !== 1 ? 's' : ''} · ${lastUpdated}</div>
+      </div>
+      <button class="account-item-delete" onclick="deleteAccount(event, '${key}')" title="Delete">×</button>
+    </div>`;
+  }).join('');
+}
+
+// ── LOAD ACCOUNT ──
+function loadAccount(key) {
+  const accounts = getAccounts();
+  const acc = accounts[key];
+  if (!acc) return;
+
+  document.getElementById('f-account').value = acc.name;
+  document.getElementById('f-calltype').value = acc.callType || 'QBR';
+
+  // Build full notes from all sessions
+  const allNotes = (acc.sessions || []).map((s, i) => {
+    const label = s.date ? `\n--- Session ${i+1} (${s.date}) ---\n` : `\n--- Session ${i+1} ---\n`;
+    return label + s.notes;
+  }).join('\n');
+
+  document.getElementById('f-notes').value = allNotes;
+  document.getElementById('char-count').textContent = allNotes.length + ' chars';
+
+  if (acc.sessions && acc.sessions.length > 0) {
+    document.getElementById('update-banner').classList.add('visible');
+  }
+
+  renderAccountList();
+  document.getElementById('output').classList.remove('visible');
+  document.getElementById('empty-state').style.display = '';
+}
+
+// ── NEW ACCOUNT ──
+function newAccount() {
+  document.getElementById('f-account').value = '';
+  document.getElementById('f-notes').value = '';
+  document.getElementById('char-count').textContent = '0 chars';
+  document.getElementById('update-banner').classList.remove('visible');
+  document.getElementById('saved-indicator').classList.remove('visible');
+  document.getElementById('output').classList.remove('visible');
+  document.getElementById('empty-state').style.display = '';
+  renderAccountList();
+  document.getElementById('f-account').focus();
+}
+
+// ── SAVE ACCOUNT ──
+function saveCurrentAccount() {
+  const name = document.getElementById('f-account').value.trim();
+  const notes = document.getElementById('f-notes').value.trim();
+  const callType = document.getElementById('f-calltype').value;
+
+  if (!name) { alert('Please enter an account name first.'); return; }
+  if (!notes) { alert('Please add some notes first.'); return; }
+
+  const accounts = getAccounts();
+  const key = name.toLowerCase();
+  const today = new Date().toLocaleDateString('en-GB', {day:'numeric', month:'short', year:'numeric'});
+
+  if (!accounts[key]) {
+    accounts[key] = { name, callType, sessions: [], updatedAt: new Date().toISOString() };
+  }
+
+  // Check if notes already saved (avoid duplicates)
+  const existing = accounts[key].sessions || [];
+  const alreadySaved = existing.some(s => s.notes === notes);
+  if (alreadySaved) {
+    showSavedIndicator();
+    return;
+  }
+
+  accounts[key].sessions.push({ notes, date: today });
+  accounts[key].callType = callType;
+  accounts[key].updatedAt = new Date().toISOString();
+  saveAccounts(accounts);
+
+  showSavedIndicator();
+  renderAccountList();
+}
+
+function showSavedIndicator() {
+  const ind = document.getElementById('saved-indicator');
+  ind.classList.add('visible');
+  setTimeout(() => ind.classList.remove('visible'), 2500);
+}
+
+// ── DELETE ACCOUNT ──
+function deleteAccount(e, key) {
+  e.stopPropagation();
+  if (!confirm('Delete this account and all its history?')) return;
+  const accounts = getAccounts();
+  delete accounts[key];
+  saveAccounts(accounts);
+  renderAccountList();
+}
+
+function onAccountNameChange() { renderAccountList(); }
+function onNotesChange() {
+  document.getElementById('char-count').textContent = document.getElementById('f-notes').value.length + ' chars';
+}
+
+// ── DEMOS ──
 const demos = {
   atrisk: {
-    account: 'Nova Corp',
-    calltype: 'QBR',
+    account: 'Nova Corp', calltype: 'QBR',
     notes: `14 Jan — Kick-off call with Marc (VP Ops) and Julie (IT Lead). Good energy. Onboarding plan validated.
-
-28 Jan — First training session delivered to 3 teams. 22 users activated out of 94 seats. Marc said the other teams would join "in the next few weeks."
-
-15 Feb — Check-in call. Usage still at 23%. Marc says IT is blocking SSO configuration, creating friction for new users. I promised to loop in our technical team.
-
+28 Jan — First training session delivered to 3 teams. 22 users activated out of 94 seats. Marc said other teams would join "in the next few weeks."
+15 Feb — Check-in call. Usage still at 23%. Marc says IT is blocking SSO configuration. I promised to loop in our technical team.
 17 Feb — Opened internal escalation with our infra team. No response yet.
-
 3 Mar — Email from Julie: SSO still not working. Two users gave up and went back to the old tool. She cc'd her CTO.
-
 10 Mar — Call with Marc. He mentioned the company is going through a restructuring. Budget review planned for Q2. He was vaguer than usual.
-
 18 Mar — I sent a follow-up email with the SSO fix instructions. No reply.
-
 2 Apr — LinkedIn: Marc has updated his profile. Looks like he may have left the company.
-
-5 Apr — Email from an unknown contact at Nova Corp, Sara Petit (Operations Manager), asking "who our main contact is." I haven't replied yet.
-
+5 Apr — Email from Sara Petit (Operations Manager) asking "who our main contact is." I haven't replied yet.
 QBR scheduled for Monday. Renewal is in 6 weeks. Current usage: 31%.`
   },
   expansion: {
-    account: 'Orbit Analytics',
-    calltype: 'Expansion',
-    notes: `2 Feb — Onboarding call with Lena (CEO) and Tom (Head of Data). Very engaged. They onboarded 19 users in the first week.
-
-14 Feb — Lena sent an unsolicited email saying the team loves the platform. She asked about advanced analytics features.
-
+    account: 'Orbit Analytics', calltype: 'Expansion',
+    notes: `2 Feb — Onboarding call with Lena (CEO) and Tom (Head of Data). Very engaged. 19 users onboarded in first week.
+14 Feb — Lena sent unsolicited email saying the team loves the platform. Asked about advanced analytics features.
 1 Mar — Monthly check-in. DAU at 89%. Tom asked about API access to connect their data warehouse. I said I'd check pricing.
-
-3 Mar — I sent the API add-on pricing. Lena replied within 20 minutes saying it looks interesting and they'd discuss internally.
-
-15 Mar — Lena mentioned on a call that they're planning to hire 3 new data analysts in Q2. She asked if we offer volume discounts for 30+ seats. I said I'd check with my team.
-
-20 Mar — I followed up on the volume discount question. Still waiting for internal approval on our end.
-
-28 Mar — Lena posted on LinkedIn about their data stack. Mentioned our platform by name. Post got 200+ likes.
-
-5 Apr — Tom asked during a call if we support SSO. They're planning to roll out to the whole company (estimated 40-50 users). I said yes and sent the doc.
-
+3 Mar — Sent the API add-on pricing. Lena replied within 20 minutes — looks interesting, will discuss internally.
+15 Mar — Lena mentioned they're hiring 3 new data analysts in Q2. Asked about volume discounts for 30+ seats.
+20 Mar — I followed up on volume discount. Still waiting for internal approval on our end.
+28 Mar — Lena posted on LinkedIn about their data stack, mentioned our platform by name. 200+ likes.
+5 Apr — Tom asked about SSO. They're planning to roll out to whole company (40-50 users). I sent the doc.
 Next call: Expansion discussion. Current seats: 19. Target: 40+.`
   },
   renewal: {
-    account: 'Brightfield Co',
-    calltype: 'Renewal',
-    notes: `Sep 15 — Annual kick-off. Paul (Head of Marketing) seemed skeptical but open. Contract value: €18,000/year. Renewal in April.
-
+    account: 'Brightfield Co', calltype: 'Renewal',
+    notes: `Sep 15 — Annual kick-off. Paul (Head of Marketing) seemed skeptical but open. Contract: €18,000/year. Renewal in April.
 Oct 3 — First training. Only 8 of 30 users showed up. Paul said people are "very busy" with a product launch.
-
-Oct 20 — Paul sent an email asking for ROI data. He said his CFO is asking questions about the subscription cost.
-
-Oct 22 — I sent a usage report. Numbers were low: 28% DAU. I tried to spin it positively but it wasn't convincing.
-
-Nov 15 — Check-in call. Paul mentioned a competitor reached out to them with a lower price. I didn't ask which one.
-
+Oct 20 — Paul emailed asking for ROI data. His CFO is asking questions about the subscription cost.
+Oct 22 — I sent a usage report. Numbers were low: 28% DAU.
+Nov 15 — Check-in call. Paul mentioned a competitor reached out with a lower price.
 Dec — No contact. I was on holiday. No check-in happened.
-
-Jan 10 — Email from Paul: "Are there any new features coming? We're evaluating our tools for next year." I replied with our roadmap PDF.
-
+Jan 10 — Email from Paul: "Are there any new features coming? We're evaluating our tools for next year."
 Jan 20 — Paul replied: "Thanks. We'll be in touch."
-
 Feb — No contact. I sent one email, no reply.
-
-Mar 5 — Renewal reminder sent automatically by our system. Paul replied: "Can we have a call before we decide?"
-
-Renewal call scheduled for next week. Contract ends April 30.`
+Mar 5 — Renewal reminder sent automatically. Paul replied: "Can we have a call before we decide?"
+Renewal call next week. Contract ends April 30.`
   }
 };
 
@@ -398,15 +653,14 @@ function loadDemo(key) {
   document.getElementById('f-account').value = d.account;
   document.getElementById('f-calltype').value = d.calltype;
   document.getElementById('f-notes').value = d.notes;
-  document.getElementById('char-count').textContent = d.notes.length + ' characters';
+  document.getElementById('char-count').textContent = d.notes.length + ' chars';
+  document.getElementById('update-banner').classList.remove('visible');
   document.getElementById('output').classList.remove('visible');
   document.getElementById('empty-state').style.display = '';
+  renderAccountList();
 }
 
-const TYPE_ICONS = {
-  call: '📞', email: '✉️', ticket: '🎫', commitment: '🤝', win: '✅', risk: '⚠️'
-};
-
+// ── GENERATE ──
 async function generate() {
   const btn = document.getElementById('gen-btn');
   const notes = document.getElementById('f-notes').value.trim();
@@ -416,7 +670,7 @@ async function generate() {
   if (!notes) { alert('Please paste your account notes first.'); return; }
 
   btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> Analyzing notes...';
+  btn.innerHTML = '<span class="spinner"></span> Analyzing...';
 
   try {
     const resp = await fetch(API_URL, {
@@ -430,80 +684,90 @@ async function generate() {
 
     // Header
     document.getElementById('out-account').textContent = data.account_name || account || 'Account';
-    document.getElementById('out-meta').textContent = `${data.call_type || callType} · Pre-call brief`;
+    document.getElementById('out-meta').textContent = `${data.call_type || callType} · Pre-call brief · ${new Date().toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'})}`;
     document.getElementById('out-read').textContent = data.account_read || '';
-
-    // Don't forget
     document.getElementById('out-df-text').textContent = data.dont_forget || '';
 
+    // History strip — show sessions if account is saved
+    const accounts = getAccounts();
+    const key = account.toLowerCase();
+    const acc = accounts[key];
+    const histWrap = document.getElementById('history-strip-wrap');
+    if (acc && acc.sessions && acc.sessions.length > 1) {
+      histWrap.innerHTML = `<div class="history-strip">
+        <div class="history-title">Session history — ${acc.sessions.length} sessions</div>
+        <div class="history-items">
+          ${acc.sessions.map((s,i) => `<div class="history-item">
+            <span class="history-date">${s.date || 'Session '+(i+1)}</span>
+            <span class="history-label">${s.notes.substring(0,60).trim()}...</span>
+          </div>`).join('')}
+        </div>
+      </div>`;
+    } else {
+      histWrap.innerHTML = '';
+    }
+
     // Timeline
-    const tl = document.getElementById('out-timeline');
-    tl.innerHTML = (data.timeline || []).map(e => {
+    document.getElementById('out-timeline').innerHTML = (data.timeline || []).map(e => {
       const dotClass = ['call','email','ticket','commitment','win','risk'].includes(e.type) ? e.type : 'email';
       const icon = TYPE_ICONS[e.type] || '•';
       const flagHtml = e.flag && e.flag !== 'neutral'
-        ? `<span class="tl-flag flag-${e.flag}">${e.flag === 'open_commitment' ? '⚠ open commitment' : e.flag === 'risk' ? '🔴 risk' : '✅ win'}</span>`
-        : '';
+        ? `<span class="tl-flag flag-${e.flag}">${e.flag==='open_commitment'?'⚠ open commitment':e.flag==='risk'?'🔴 risk':'✅ win'}</span>` : '';
       return `<div class="tl-item">
         <div class="tl-dot ${dotClass}">${icon}</div>
         <div class="tl-content">
-          <div class="tl-date">${e.date || ''}</div>
-          <div class="tl-title">${e.title || ''}</div>
-          <div class="tl-detail">${e.detail || ''}</div>
+          <div class="tl-date">${e.date||''}</div>
+          <div class="tl-title">${e.title||''}</div>
+          <div class="tl-detail">${e.detail||''}</div>
           ${flagHtml}
         </div>
       </div>`;
     }).join('');
 
-    // Open commitments
-    const oc = document.getElementById('out-commitments');
+    // Commitments
     const commitments = data.open_commitments || [];
     if (commitments.length === 0) {
       document.getElementById('commitments-card').style.display = 'none';
     } else {
       document.getElementById('commitments-card').style.display = '';
-      oc.innerHTML = commitments.map(c => `
-        <div class="commitment-item ${c.status || 'unclear'}">
+      document.getElementById('out-commitments').innerHTML = commitments.map(c => `
+        <div class="commitment-item ${c.status||'unclear'}">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
-            <div class="commitment-what">${c.what || ''}</div>
-            <span class="commitment-badge badge-${c.status || 'unclear'}">${c.status || 'unclear'}</span>
+            <div class="commitment-what">${c.what||''}</div>
+            <span class="commitment-badge badge-${c.status||'unclear'}">${c.status||'unclear'}</span>
           </div>
           <div class="commitment-meta">
-            ${c.promised_on ? `<span>Promised: ${c.promised_on}</span>` : ''}
-            ${c.promised_by ? `<span>By: ${c.promised_by}</span>` : ''}
-            ${c.urgency ? `<span>Urgency: ${c.urgency}</span>` : ''}
+            ${c.promised_on?`<span>Promised: ${c.promised_on}</span>`:''}
+            ${c.promised_by?`<span>By: ${c.promised_by}</span>`:''}
+            ${c.urgency?`<span>Urgency: ${c.urgency}</span>`:''}
           </div>
-        </div>
-      `).join('');
+        </div>`).join('');
     }
 
-    // Risk signals
-    const rs = document.getElementById('out-risks');
+    // Risks
     const risks = data.risk_signals || [];
     if (risks.length === 0) {
       document.getElementById('risks-card').style.display = 'none';
     } else {
       document.getElementById('risks-card').style.display = '';
-      rs.innerHTML = risks.map(r => `
+      document.getElementById('out-risks').innerHTML = risks.map(r => `
         <div class="risk-item">
-          <div class="risk-signal">${r.signal || ''}</div>
-          <div class="risk-why">${r.why_it_matters || ''}</div>
-        </div>
-      `).join('');
+          <div class="risk-signal">${r.signal||''}</div>
+          <div class="risk-why">${r.why_it_matters||''}</div>
+        </div>`).join('');
     }
 
     // Questions
-    document.getElementById('out-questions').innerHTML = (data.questions_to_ask || []).map((q, i) => `
+    document.getElementById('out-questions').innerHTML = (data.questions_to_ask || []).map((q,i) => `
       <div class="question-item">
-        <div class="question-num">Question ${i + 1}</div>
-        <div class="question-text">"${q.question || ''}"</div>
-        <div class="question-why">${q.why || ''}</div>
-      </div>
-    `).join('');
+        <div class="question-num">Question ${i+1}</div>
+        <div class="question-text">"${q.question||''}"</div>
+        <div class="question-why">${q.why||''}</div>
+      </div>`).join('');
 
     document.getElementById('empty-state').style.display = 'none';
     document.getElementById('output').classList.add('visible');
-    document.getElementById('output').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.getElementById('output').scrollIntoView({behavior:'smooth',block:'start'});
 
   } catch(e) {
     alert('Failed to generate brief: ' + e.message);
@@ -511,6 +775,46 @@ async function generate() {
 
   btn.disabled = false;
   btn.innerHTML = '✦ Generate Pre-Call Brief';
+}
+
+// ── INIT ──
+renderAccountList();
+
+// ── ONBOARDING ──
+function obNext(current) {
+  document.getElementById('ob-step-' + current).classList.remove('active');
+  document.getElementById('ob-step-' + (current+1)).classList.add('active');
+}
+function obSkip() {
+  document.getElementById('onboarding-overlay').classList.add('hidden');
+  localStorage.setItem('callprep_onboarded', '1');
+}
+function obFinish(demo) {
+  document.getElementById('onboarding-overlay').classList.add('hidden');
+  localStorage.setItem('callprep_onboarded', '1');
+  if (demo) loadDemo(demo);
+}
+
+// ── PRINT SETUP ──
+function setupPrint() {
+  document.querySelectorAll('.print-btn').forEach(btn => {
+    btn.onclick = () => {
+      const account = document.getElementById('out-account').textContent;
+      const meta = document.getElementById('out-meta').textContent;
+      const dateStr = new Date().toLocaleDateString('en-GB', {day:'numeric',month:'long',year:'numeric'});
+      document.querySelector('.print-logo span').textContent = account + ' — ' + meta;
+      document.getElementById('print-date').textContent = 'Generated: ' + dateStr;
+      window.print();
+    };
+  });
+}
+setupPrint();
+
+// Show onboarding only on first visit
+if (!localStorage.getItem('callprep_onboarded')) {
+  document.getElementById('onboarding-overlay').classList.remove('hidden');
+} else {
+  document.getElementById('onboarding-overlay').classList.add('hidden');
 }
 </script>
 </body>
