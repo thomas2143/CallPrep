@@ -315,33 +315,7 @@ textarea::placeholder{color:var(--slate-400);font-style:italic;font-family:var(-
   <!-- LEFT PANEL -->
   <div class="panel-left">
 
-    <!-- SAVED ACCOUNTS -->
-    <div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-        <div class="section-label" style="margin-bottom:0;">Your accounts</div>
-        <span style="font-size:11px;color:var(--slate-400);" id="accounts-count"></span>
-      </div>
-      <div class="accounts-list" id="accounts-list">
-        <div class="no-accounts" id="no-accounts">No saved accounts yet</div>
-      </div>
-      <button class="new-account-btn" style="margin-top:8px;" onclick="newAccount()">+ New account</button>
-    </div>
-
-    <div class="divider"></div>
-
-    <!-- DEMO -->
-    <div>
-      <div class="section-label">Load a demo</div>
-      <div class="demo-chips">
-        <span class="demo-chip" onclick="loadDemo('atrisk')">🔴 At-risk</span>
-        <span class="demo-chip" onclick="loadDemo('expansion')">🚀 Expansion</span>
-        <span class="demo-chip" onclick="loadDemo('renewal')">🔄 Renewal</span>
-      </div>
-    </div>
-
-    <div class="divider"></div>
-
-    <!-- FORM -->
+    <!-- TOP: ACCOUNT NAME + CALL TYPE + GENERATE -->
     <div class="form-row">
       <div class="form-group">
         <label>Account name</label>
@@ -365,10 +339,10 @@ textarea::placeholder{color:var(--slate-400);font-style:italic;font-family:var(-
       <span>Previous notes loaded. <strong>Add new notes below</strong> — the AI will analyze the full history.</span>
     </div>
 
-    <!-- NOTES -->
-    <div style="display:flex;flex-direction:column;flex:1;">
+    <!-- NOTES — main focus, takes max space -->
+    <div style="display:flex;flex-direction:column;flex:1;min-height:0;">
       <div class="notes-label-row">
-        <div class="section-label" style="margin-bottom:0;">Notes — paste everything here</div>
+        <div class="section-label" style="margin-bottom:0;">Your notes</div>
         <div class="notes-actions">
           <span class="saved-indicator" id="saved-indicator">✓ Saved</span>
           <span class="char-count" id="char-count">0 chars</span>
@@ -376,6 +350,7 @@ textarea::placeholder{color:var(--slate-400);font-style:italic;font-family:var(-
       </div>
       <textarea
         id="f-notes"
+        style="flex:1;min-height:200px;"
         placeholder="Paste everything you have — call notes, emails, tickets, Slack messages. Dates help but aren't required. The messier, the better.
 
 Example:
@@ -384,14 +359,41 @@ Example:
 22 Mar — email from Sarah, no reply from me yet..."
         oninput="onNotesChange()"
       ></textarea>
-      <div style="display:flex;gap:8px;margin-top:8px;">
-        <button class="save-btn" onclick="saveCurrentAccount()" style="flex:1;padding:8px;">💾 Save account</button>
-      </div>
     </div>
 
+    <!-- GENERATE — primary CTA, always visible -->
     <button class="gen-btn" id="gen-btn" onclick="generate()">
       ✦ Generate Pre-Call Brief
     </button>
+
+    <!-- SAVE -->
+    <button class="save-btn" onclick="saveCurrentAccount()" style="width:100%;padding:9px;font-size:13px;">💾 Save account notes</button>
+
+    <div class="divider"></div>
+
+    <!-- SAVED ACCOUNTS — secondary, below the fold -->
+    <div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <div class="section-label" style="margin-bottom:0;">Saved accounts</div>
+        <span style="font-size:11px;color:var(--slate-400);" id="accounts-count"></span>
+      </div>
+      <div class="accounts-list" id="accounts-list">
+        <div class="no-accounts" id="no-accounts">No saved accounts yet</div>
+      </div>
+      <button class="new-account-btn" style="margin-top:8px;" onclick="newAccount()">+ New account</button>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- DEMO — tertiary, clearly labelled -->
+    <div>
+      <div class="section-label">Try a demo scenario</div>
+      <div class="demo-chips">
+        <span class="demo-chip" onclick="loadDemo('atrisk')">🔴 At-risk</span>
+        <span class="demo-chip" onclick="loadDemo('expansion')">🚀 Expansion</span>
+        <span class="demo-chip" onclick="loadDemo('renewal')">🔄 Renewal</span>
+      </div>
+    </div>
 
   </div>
 
