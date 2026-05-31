@@ -219,6 +219,37 @@ textarea::placeholder{color:var(--text-3);font-style:italic;font-family:var(--fo
 }
 
 /* PRINT — A4 clean brief */
+/* PREP SCORE */
+.prep-score-bar{margin-top:8px;padding:10px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface-2);display:flex;flex-direction:column;gap:6px;}
+.prep-score-top{display:flex;align-items:center;justify-content:space-between;}
+.prep-score-label{font-size:11px;font-weight:600;color:var(--text-3);font-family:var(--font-heading);letter-spacing:.5px;text-transform:uppercase;}
+.prep-score-val{font-family:var(--font-heading);font-size:12px;font-weight:700;}
+.prep-track{height:4px;background:var(--border);border-radius:2px;overflow:hidden;}
+.prep-fill{height:100%;border-radius:2px;transition:width .4s,background .4s;}
+.prep-hint{font-size:11px;color:var(--text-3);line-height:1.5;}
+.prep-hint.warn{color:var(--amber-text);}
+.prep-hint.good{color:var(--green-text);}
+
+/* SENTIMENT CARD */
+.sentiment-card{border-radius:var(--radius);padding:14px 20px;border:1px solid;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow);}
+.sentiment-card.positive{background:var(--green-bg);border-color:var(--green-border);}
+.sentiment-card.neutral{background:var(--surface);border-color:var(--border);}
+.sentiment-card.concerned{background:var(--amber-bg);border-color:var(--amber-border);}
+.sentiment-card.at-risk{background:var(--red-bg);border-color:var(--red-border);}
+.sentiment-icon{font-size:28px;flex-shrink:0;}
+.sentiment-info{flex:1;}
+.sentiment-label{font-family:var(--font-heading);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:3px;}
+.sentiment-card.positive .sentiment-label{color:var(--green-text);}
+.sentiment-card.neutral .sentiment-label{color:var(--text-3);}
+.sentiment-card.concerned .sentiment-label{color:var(--amber-text);}
+.sentiment-card.at-risk .sentiment-label{color:var(--red-text);}
+.sentiment-read{font-size:13px;color:var(--text-2);line-height:1.5;margin-bottom:6px;}
+.sentiment-opener{font-size:13px;font-style:italic;color:var(--text);font-weight:500;padding:8px 12px;border-radius:var(--radius-sm);margin-top:6px;}
+.sentiment-card.positive .sentiment-opener{background:rgba(16,185,129,.08);}
+.sentiment-card.neutral .sentiment-opener{background:var(--surface-2);}
+.sentiment-card.concerned .sentiment-opener{background:rgba(245,158,11,.08);}
+.sentiment-card.at-risk .sentiment-opener{background:rgba(239,68,68,.08);}
+
 /* WATCHLIST */
 .watchlist{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 32px;}
 .watchlist-inner{max-width:1400px;margin:0 auto;}
@@ -448,6 +479,14 @@ The AI handles the mess — that's the point."
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         Your notes never leave your browser — paste freely, nothing is stored on our servers.
       </div>
+      <div class="prep-score-bar" id="prep-score-bar" style="display:none;">
+        <div class="prep-score-top">
+          <span class="prep-score-label">Brief quality</span>
+          <span class="prep-score-val" id="prep-score-val">—</span>
+        </div>
+        <div class="prep-track"><div class="prep-fill" id="prep-fill" style="width:0%;background:var(--amber);"></div></div>
+        <div class="prep-hint" id="prep-hint"></div>
+      </div>
     </div>
 
     <!-- GENERATE — primary CTA, always visible -->
@@ -516,6 +555,8 @@ The AI handles the mess — that's the point."
       </div>
 
       <div id="history-strip-wrap"></div>
+
+      <div id="sentiment-card-wrap"></div>
 
       <div style="display:flex;gap:10px;flex-wrap:wrap;" id="post-brief-actions">
         <button onclick="draftFollowUp()" style="font-family:var(--font-heading);font-size:13px;font-weight:500;padding:9px 18px;border-radius:var(--radius-sm);border:1px solid var(--accent-border);background:var(--accent-light);color:var(--accent);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px;" onmouseover="this.style.background='rgba(99,102,241,.25)'" onmouseout="this.style.background='var(--accent-light)'">
@@ -866,11 +907,14 @@ function deleteAccount(e, key) {
 
 function onAccountNameChange() { renderAccountList(); }
 function onNotesChange() {
-  var len = document.getElementById('f-notes').value.length;
+  var notes = document.getElementById('f-notes').value;
+  var len = notes.length;
   var el = document.getElementById('char-count');
   if (len === 0) {
     el.textContent = '0 chars';
     el.style.color = 'var(--text-3)';
+    document.getElementById('prep-score-bar').style.display = 'none';
+    return;
   } else if (len < 300) {
     el.textContent = len + ' chars — add more for a richer brief';
     el.style.color = 'var(--amber-text)';
@@ -880,6 +924,66 @@ function onNotesChange() {
   } else {
     el.textContent = len + ' chars — great';
     el.style.color = 'var(--green-text)';
+  }
+  updatePrepScore(notes);
+}
+
+function updatePrepScore(notes) {
+  var bar = document.getElementById('prep-score-bar');
+  var fill = document.getElementById('prep-fill');
+  var val = document.getElementById('prep-score-val');
+  var hint = document.getElementById('prep-hint');
+  bar.style.display = 'block';
+
+  var score = 0;
+  var missing = [];
+
+  var lower = notes.toLowerCase();
+
+  // Check for dates (strong signal of structured notes)
+  var hasDates = /(\d{1,2}\s+(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)|jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec\s+\d{1,2}|\d{1,2}\/\d{1,2}|\d{4}-\d{2}-\d{2})/i.test(notes);
+  if (hasDates) score += 25; else missing.push('dates or timeline');
+
+  // Check for call/meeting signals
+  var hasCall = /(call|meeting|spoke|talked|discussed|zoom|teams)/i.test(notes);
+  if (hasCall) score += 20; else missing.push('call or meeting notes');
+
+  // Check for email signals
+  var hasEmail = /(email|wrote|replied|sent|message|emailed)/i.test(notes);
+  if (hasEmail) score += 15; else missing.push('email thread');
+
+  // Check for issue/ticket signals
+  var hasIssue = /(ticket|issue|bug|problem|error|support|case|escalat)/i.test(notes);
+  if (hasIssue) score += 15; else missing.push('support tickets or issues');
+
+  // Check for people/contacts
+  var hasPeople = /([A-Z][a-z]+ [A-Z][a-z]+|VP|CEO|CTO|Head of|Manager|Director)/i.test(notes);
+  if (hasPeople) score += 15;
+
+  // Bonus for length
+  if (notes.length > 500) score += 5;
+  if (notes.length > 1000) score += 5;
+
+  score = Math.min(score, 100);
+
+  // Color
+  var color = score < 40 ? 'var(--red)' : score < 65 ? 'var(--amber)' : 'var(--green)';
+  var label = score < 40 ? 'Weak' : score < 65 ? 'Decent' : score < 85 ? 'Good' : 'Strong';
+
+  fill.style.width = score + '%';
+  fill.style.background = color;
+  val.textContent = label + ' · ' + score + '/100';
+  val.style.color = color;
+
+  if (missing.length > 0 && score < 85) {
+    hint.className = 'prep-hint warn';
+    hint.textContent = 'Missing: ' + missing.slice(0,2).join(', ') + '. Add these for a richer brief.';
+  } else if (score >= 85) {
+    hint.className = 'prep-hint good';
+    hint.textContent = 'Great input — your brief will be detailed and accurate.';
+  } else {
+    hint.className = 'prep-hint good';
+    hint.textContent = 'Solid input. Add more context for an even richer brief.';
   }
 }
 
@@ -951,7 +1055,7 @@ async function generate() {
   btn.innerHTML = '<span class="spinner"></span> Analyzing...';
 
   try {
-    var p1 = 'You are a senior CSM. Analyze notes and return ONLY valid JSON no markdown. ACCOUNT: '+account+' CALL TYPE: '+callType+' NOTES: '+notes.slice(0,8000)+' Return: {"account_name":"","call_type":"","account_read":"2-3 sentence CSM reading of this account","timeline":[{"date":"","type":"call|email|ticket|commitment|win|risk","title":"max 6 words","detail":"one sentence","flag":"open_commitment|risk|win|neutral"}],"open_commitments":[{"what":"","promised_on":"","promised_by":"CSM|client|unknown","status":"overdue|pending|unclear","urgency":"high|medium|low"}],"risk_signals":[{"signal":"","why_it_matters":"one sentence"}],"questions_to_ask":[{"question":"","why":""}],"dont_forget":"most important thing for this call"}';
+    var p1 = 'You are a senior CSM. Analyze notes and return ONLY valid JSON no markdown. ACCOUNT: '+account+' CALL TYPE: '+callType+' NOTES: '+notes.slice(0,8000)+' Return: {"account_name":"","call_type":"","account_read":"2-3 sentence CSM reading of this account","sentiment":"positive|neutral|concerned|at-risk","sentiment_reason":"one sentence explaining the detected sentiment based on specific signals in the notes","opening_line":"the perfect first sentence to say when the call starts — tailored to the sentiment and account context. If at-risk: empathetic and direct. If positive: warm and forward-looking. If expansion: ambitious. Max 25 words.","timeline":[{"date":"","type":"call|email|ticket|commitment|win|risk","title":"max 6 words","detail":"one sentence","flag":"open_commitment|risk|win|neutral"}],"open_commitments":[{"what":"","promised_on":"","promised_by":"CSM|client|unknown","status":"overdue|pending|unclear","urgency":"high|medium|low"}],"risk_signals":[{"signal":"","why_it_matters":"one sentence"}],"questions_to_ask":[{"question":"","why":""}],"dont_forget":"most important thing for this call"}';
     const data = await groqCall(p1, 2000);
     if (data.error) throw new Error(data.error);
 
@@ -960,6 +1064,27 @@ async function generate() {
     document.getElementById('out-meta').textContent = `${data.call_type || callType} · Pre-call brief · ${new Date().toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'})}`;
     document.getElementById('out-read').textContent = data.account_read || '';
     document.getElementById('out-df-text').textContent = data.dont_forget || '';
+
+    // Sentiment card
+    var sentWrap = document.getElementById('sentiment-card-wrap');
+    if (data.sentiment) {
+      var sentIcons = {positive:'😊', neutral:'😐', concerned:'😟', 'at-risk':'🚨'};
+      var sentLabels = {positive:'Positive sentiment', neutral:'Neutral sentiment', concerned:'Concerned', 'at-risk':'At risk'};
+      var icon = sentIcons[data.sentiment] || '😐';
+      var label = sentLabels[data.sentiment] || data.sentiment;
+      sentWrap.innerHTML = '';
+      var card = document.createElement('div');
+      card.className = 'sentiment-card ' + data.sentiment;
+      card.innerHTML = '<div class="sentiment-icon">' + icon + '</div>' +
+        '<div class="sentiment-info">' +
+          '<div class="sentiment-label">' + label + '</div>' +
+          '<div class="sentiment-read">' + (data.sentiment_reason||'') + '</div>' +
+          (data.opening_line ? '<div class="sentiment-opener">💬 &ldquo;' + data.opening_line + '&rdquo;</div>' : '') +
+        '</div>';
+      sentWrap.appendChild(card);
+    } else {
+      sentWrap.innerHTML = '';
+    }
 
     // History strip — show sessions if account is saved
     const accounts = getAccounts();
