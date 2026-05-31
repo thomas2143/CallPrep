@@ -636,184 +636,25 @@ Example:
 </div>
 
 <script>
-async function draftFollowUp() {
-  var btn = event.target.closest('button');
-  var origText = btn.innerHTML;
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner" style="border-color:rgba(99,102,241,.3);border-top-color:var(--accent);width:13px;height:13px;border-width:2px;display:inline-block;border-radius:50%;animation:spin .7s linear infinite;vertical-align:-2px;margin-right:6px;"></span> Drafting...';
+var GROQ_KEY = "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";
 
-  var account = document.getElementById('out-account').textContent;
-  var commitments = document.getElementById('out-commitments').innerText || '';
-  var risks = document.getElementById('out-risks').innerText || '';
-  var nextSteps = document.getElementById('out-next') ? document.getElementById('out-next').innerText : '';
-  var callType = document.getElementById('f-calltype').value;
-
-  try {
-    var resp = await fetch('/api/call-prep', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        notes: 'Draft a professional follow-up email after a ' + callType + ' call with ' + account + '. Open commitments: ' + commitments + '. Risk signals: ' + risks + '. Next steps discussed: ' + nextSteps,
-        account: account,
-        callType: 'follow_up_email',
-        mode: 'email'
-      })
-    });
-    var data = await resp.json();
-    var emailText = data.dont_forget || data.account_read || '';
-
-    var resp2 = await fetch('/api/followup', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ account: account, callType: callType, commitments: commitments, risks: risks, nextSteps: nextSteps })
-    });
-    var d2 = await resp2.json();
-    showExtra('Follow-up email draft — ' + account, d2.email || 'Could not generate email.');
-  } catch(e) {
-    showExtra('Error', e.message);
-  }
-
-  btn.disabled = false;
-  btn.innerHTML = origText;
-}
-
-async function summarizeCall() {
-  var btn = event.target.closest('button');
-  var origText = btn.innerHTML;
-  openTranscriptModal();
-  window._summaryBtn = btn;
-  window._summaryOrigText = origText;
-}
-
-async function runSummarizeCall(transcript) {
-  var btn = window._summaryBtn;
-  var origText = window._summaryOrigText;
-  if (!transcript || !transcript.trim()) return;
-
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner" style="border-color:rgba(255,255,255,.2);border-top-color:var(--text-2);width:13px;height:13px;border-width:2px;display:inline-block;border-radius:50%;animation:spin .7s linear infinite;vertical-align:-2px;margin-right:6px;"></span> Summarizing...';
-
-  var account = document.getElementById('f-account').value || document.getElementById('out-account').textContent || 'Account';
-
-  try {
-    var resp = await fetch('/api/call-summary', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ transcript: transcript, account: account })
-    });
-    var data = await resp.json();
-    if (data.error) throw new Error(data.error);
-    var text = 'DECISIONS MADE:\n' + (data.decisions||[]).join('\n') + '\n\nCOMMITMENTS TAKEN:\n' + (data.commitments||[]).join('\n') + '\n\nNEXT STEPS:\n' + (data.next_steps||[]).join('\n') + '\n\nKEY QUOTE:\n' + (data.key_quote||'');
-    showExtra('Call summary — ' + account, text);
-
-    var saveNote = confirm('Save this summary to ' + account + ' account history?');
-    if (saveNote) {
-      var accounts = getAccounts();
-      var key = account.toLowerCase();
-      if (accounts[key]) {
-        var today = new Date().toLocaleDateString('en-GB', {day:'numeric', month:'short', year:'numeric'});
-        accounts[key].sessions.push({ notes: transcript, date: today });
-        accounts[key].updatedAt = new Date().toISOString();
-        saveAccounts(accounts);
-        renderAccountList();
-        buildWatchlist();
-        document.getElementById('saved-indicator').classList.add('visible');
-        setTimeout(function(){ document.getElementById('saved-indicator').classList.remove('visible'); }, 2500);
-      }
-    }
-  } catch(e) {
-    showExtra('Error', e.message);
-  }
-
-  btn.disabled = false;
-  btn.innerHTML = origText;
-}
-
-function openTranscriptModal() {
-  document.getElementById('transcript-modal').style.display = 'flex';
-  document.getElementById('transcript-input').value = '';
-  document.getElementById('transcript-input').focus();
-}
-
-function closeTranscriptModal() {
-  document.getElementById('transcript-modal').style.display = 'none';
-}
-
-async function submitTranscript() {
-  var text = document.getElementById('transcript-input').value.trim();
-  if (!text) return;
-  closeTranscriptModal();
-  await runSummarizeCall(text);
-}
-
-function showExtra(title, content) {
-  document.getElementById('extra-title').textContent = title;
-  document.getElementById('extra-content').textContent = content;
-  document.getElementById('extra-output').style.display = 'block';
-  document.getElementById('extra-output').scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-function submitFeedback(type) {
-  const bar = document.getElementById('feedback-bar');
-  const account = document.getElementById('out-account').textContent || 'unknown';
-
-  // Store locally
-  const key = 'debrief_feedback';
-  const existing = JSON.parse(localStorage.getItem(key) || '[]');
-  existing.push({ type, account, date: new Date().toISOString() });
-  localStorage.setItem(key, JSON.stringify(existing));
-
-  // Visual confirmation
-  const positive = type === 'yes';
-  bar.innerHTML = `
-    <div style="display:flex;align-items:center;gap:10px;width:100%;">
-      <span style="font-size:18px;">${positive ? '🙏' : '📝'}</span>
-      <div>
-        <div style="font-size:13px;font-weight:500;color:var(--text);">${positive ? 'Thanks — glad it helped!' : 'Thanks for the feedback.'}</div>
-        <div style="font-size:12px;color:var(--text-3);margin-top:2px;">${positive ? 'Share Debrief with your team if it saves you time.' : 'Thanks for letting me know. Reach out on LinkedIn anytime.'}</div>
-      </div>
-    </div>`;
-  bar.style.borderColor = positive ? 'var(--green-border)' : 'var(--border)';
-  bar.style.background = positive ? 'var(--green-bg)' : 'var(--surface)';
-}
-
-function shareToolLinkedIn() {
-  const text = `I built an AI tool for CSMs that solves a real problem: stop spending hours reconstructing account history before a QBR.
-
-Paste your raw notes — emails, call logs, tickets — and get a structured pre-call brief in 30 seconds:
-✅ Chronological timeline
-⚠️ Open commitments you forgot about
-🔴 Risk signals hidden in your notes
-💬 Questions tailored to that specific account
-
-Try it here → https://call-prep-uokh.vercel.app
-
-Built from scratch as part of my AI portfolio. #CustomerSuccess #CSM #AI #Productivity`;
-
-  const url = 'https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent('https://call-prep-uokh.vercel.app');
-  
-  navigator.clipboard.writeText(text).then(() => {
-    const btn = document.getElementById('share-btn');
-    btn.innerHTML = '✓ Caption copied — opening LinkedIn';
-    btn.style.background = 'var(--green-bg)';
-    btn.style.borderColor = 'var(--green-border)';
-    btn.style.color = 'var(--green-text)';
-    setTimeout(() => {
-      window.open(url, '_blank');
-      setTimeout(() => {
-        btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg> Share this tool';
-        btn.style.background = 'var(--accent-light)';
-        btn.style.borderColor = 'var(--accent-border)';
-        btn.style.color = 'var(--accent)';
-      }, 3000);
-    }, 800);
-  }).catch(() => {
-    window.open(url, '_blank');
+async function groqCall(prompt, maxTokens) {
+  var r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json','Authorization':'Bearer '+GROQ_KEY},
+    body: JSON.stringify({model:'llama-3.3-70b-versatile',max_tokens:maxTokens||2000,temperature:0.1,messages:[{role:'user',content:prompt}]})
   });
+  var j = await r.json();
+  var t = j.choices&&j.choices[0]?j.choices[0].message.content:'';
+  var c = t.replace(/```json|```/g,'').trim();
+  try{return JSON.parse(c);}catch(e){
+    var op=(c.match(/\{/g)||[]).length,cl=(c.match(/\}/g)||[]).length;
+    var rec=c.replace(/,\s*\]/g,']').replace(/,\s*\}/g,'}');
+    for(var i=0;i<op-cl;i++)rec+='}';
+    return JSON.parse(rec);
+  }
 }
-</script>
 
-<script>
 const API_URL = '/api/call-prep';
 const STORAGE_KEY = 'callprep_accounts';
 const TYPE_ICONS = {call:'📞',email:'✉️',ticket:'🎫',commitment:'🤝',win:'✅',risk:'⚠️'};
@@ -1031,13 +872,8 @@ async function generate() {
   btn.innerHTML = '<span class="spinner"></span> Analyzing...';
 
   try {
-    const resp = await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ notes, account, callType })
-    });
-
-    const data = await resp.json();
+    var p1 = 'You are a senior CSM. Analyze notes and return ONLY valid JSON no markdown. ACCOUNT: '+account+' CALL TYPE: '+callType+' NOTES: '+notes.slice(0,8000)+' Return: {"account_name":"","call_type":"","account_read":"2-3 sentence CSM reading of this account","timeline":[{"date":"","type":"call|email|ticket|commitment|win|risk","title":"max 6 words","detail":"one sentence","flag":"open_commitment|risk|win|neutral"}],"open_commitments":[{"what":"","promised_on":"","promised_by":"CSM|client|unknown","status":"overdue|pending|unclear","urgency":"high|medium|low"}],"risk_signals":[{"signal":"","why_it_matters":"one sentence"}],"questions_to_ask":[{"question":"","why":""}],"dont_forget":"most important thing for this call"}';
+    const data = await groqCall(p1, 2000);
     if (data.error) throw new Error(data.error);
 
     // Header
@@ -1135,9 +971,7 @@ async function generate() {
   btn.innerHTML = '✦ Generate Pre-Call Brief';
 }
 
-// ── INIT ──
-renderAccountList();
-buildWatchlist();
+// ── INIT (moved to end) ──
 
 // ── WATCHLIST ──
 async function buildWatchlist() {
@@ -1167,13 +1001,8 @@ async function buildWatchlist() {
   var today = new Date().toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
 
   try {
-    var resp = await fetch('/api/watchlist', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ accountSummaries: accountSummaries, today: today })
-    });
-
-    var data = await resp.json();
+    var wp = 'You are a senior CSM. Today is '+today+'. Analyze these accounts and identify which need attention THIS WEEK. ACCOUNTS: '+accountSummaries.slice(0,8000)+'. Return ONLY valid JSON no markdown: {"watchlist":[{"account":"","priority":"high|medium|low","reason":"specific signal from notes","action":"concrete action max 8 words"}]}. Sort by priority high first. high=renewal risk/escalation/sponsor change/overdue commitment. medium=no recent contact/renewal in 30-60 days. low=healthy.';
+    var data = await groqCall(wp, 1000);
     if (data.error) throw new Error(data.error);
 
     var list = data.watchlist || [];
@@ -1237,6 +1066,168 @@ if (!localStorage.getItem('callprep_onboarded')) {
   document.getElementById('onboarding-overlay').classList.remove('hidden');
 } else {
   document.getElementById('onboarding-overlay').classList.add('hidden');
+}
+
+// ── INIT ──
+renderAccountList();
+buildWatchlist();
+
+
+
+async function draftFollowUp() {
+  var btn = event.target.closest('button');
+  var origText = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner" style="border-color:rgba(99,102,241,.3);border-top-color:var(--accent);width:13px;height:13px;border-width:2px;display:inline-block;border-radius:50%;animation:spin .7s linear infinite;vertical-align:-2px;margin-right:6px;"></span> Drafting...';
+
+  var account = document.getElementById('out-account').textContent;
+  var commitments = document.getElementById('out-commitments').innerText || '';
+  var risks = document.getElementById('out-risks').innerText || '';
+  var nextSteps = document.getElementById('out-next') ? document.getElementById('out-next').innerText : '';
+  var callType = document.getElementById('f-calltype').value;
+
+  try {
+    var fp = 'You are a senior CSM. Write a professional follow-up email after a '+callType+' call with '+account+'. Commitments: '+commitments+'. Risks: '+risks+'. Next steps: '+nextSteps+'. Return ONLY valid JSON no markdown: {"subject":"subject line","email":"full email body plain text"}';
+    var d2 = await groqCall(fp, 800);
+    var emailBody = 'Subject: '+(d2.subject||'')+' | '+(d2.email||'Could not generate.');
+    showExtra('Follow-up email draft — ' + account, emailBody);
+  } catch(e) {
+    showExtra('Error', e.message);
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = origText;
+}
+
+async function summarizeCall() {
+  var btn = event.target.closest('button');
+  var origText = btn.innerHTML;
+  openTranscriptModal();
+  window._summaryBtn = btn;
+  window._summaryOrigText = origText;
+}
+
+async function runSummarizeCall(transcript) {
+  var btn = window._summaryBtn;
+  var origText = window._summaryOrigText;
+  if (!transcript || !transcript.trim()) return;
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner" style="border-color:rgba(255,255,255,.2);border-top-color:var(--text-2);width:13px;height:13px;border-width:2px;display:inline-block;border-radius:50%;animation:spin .7s linear infinite;vertical-align:-2px;margin-right:6px;"></span> Summarizing...';
+
+  var account = document.getElementById('f-account').value || document.getElementById('out-account').textContent || 'Account';
+
+  try {
+    var sp = 'You are a senior CSM summarizing a call for '+account+'. TRANSCRIPT: '+transcript.slice(0,8000)+'. Return ONLY valid JSON no markdown: {"decisions":[""],"commitments":[""],"next_steps":[""],"key_quote":"","sentiment":"positive|neutral|concerned|at-risk","one_liner":""}';
+    var data = await groqCall(sp, 800);
+    if (data.error) throw new Error(data.error);
+    var text = 'DECISIONS MADE:\n' + (data.decisions||[]).join('\n') + '\n\nCOMMITMENTS TAKEN:\n' + (data.commitments||[]).join('\n') + '\n\nNEXT STEPS:\n' + (data.next_steps||[]).join('\n') + '\n\nKEY QUOTE:\n' + (data.key_quote||'');
+    showExtra('Call summary — ' + account, text);
+
+    var saveNote = confirm('Save this summary to ' + account + ' account history?');
+    if (saveNote) {
+      var accounts = getAccounts();
+      var key = account.toLowerCase();
+      if (accounts[key]) {
+        var today = new Date().toLocaleDateString('en-GB', {day:'numeric', month:'short', year:'numeric'});
+        accounts[key].sessions.push({ notes: transcript, date: today });
+        accounts[key].updatedAt = new Date().toISOString();
+        saveAccounts(accounts);
+        renderAccountList();
+        buildWatchlist();
+        document.getElementById('saved-indicator').classList.add('visible');
+        setTimeout(function(){ document.getElementById('saved-indicator').classList.remove('visible'); }, 2500);
+      }
+    }
+  } catch(e) {
+    showExtra('Error', e.message);
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = origText;
+}
+
+function openTranscriptModal() {
+  document.getElementById('transcript-modal').style.display = 'flex';
+  document.getElementById('transcript-input').value = '';
+  document.getElementById('transcript-input').focus();
+}
+
+function closeTranscriptModal() {
+  document.getElementById('transcript-modal').style.display = 'none';
+}
+
+async function submitTranscript() {
+  var text = document.getElementById('transcript-input').value.trim();
+  if (!text) return;
+  closeTranscriptModal();
+  await runSummarizeCall(text);
+}
+
+function showExtra(title, content) {
+  document.getElementById('extra-title').textContent = title;
+  document.getElementById('extra-content').textContent = content;
+  document.getElementById('extra-output').style.display = 'block';
+  document.getElementById('extra-output').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function submitFeedback(type) {
+  const bar = document.getElementById('feedback-bar');
+  const account = document.getElementById('out-account').textContent || 'unknown';
+
+  // Store locally
+  const key = 'debrief_feedback';
+  const existing = JSON.parse(localStorage.getItem(key) || '[]');
+  existing.push({ type, account, date: new Date().toISOString() });
+  localStorage.setItem(key, JSON.stringify(existing));
+
+  // Visual confirmation
+  const positive = type === 'yes';
+  bar.innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;width:100%;">
+      <span style="font-size:18px;">${positive ? '🙏' : '📝'}</span>
+      <div>
+        <div style="font-size:13px;font-weight:500;color:var(--text);">${positive ? 'Thanks — glad it helped!' : 'Thanks for the feedback.'}</div>
+        <div style="font-size:12px;color:var(--text-3);margin-top:2px;">${positive ? 'Share Debrief with your team if it saves you time.' : 'Thanks for letting me know. Reach out on LinkedIn anytime.'}</div>
+      </div>
+    </div>`;
+  bar.style.borderColor = positive ? 'var(--green-border)' : 'var(--border)';
+  bar.style.background = positive ? 'var(--green-bg)' : 'var(--surface)';
+}
+
+function shareToolLinkedIn() {
+  const text = `I built an AI tool for CSMs that solves a real problem: stop spending hours reconstructing account history before a QBR.
+
+Paste your raw notes — emails, call logs, tickets — and get a structured pre-call brief in 30 seconds:
+✅ Chronological timeline
+⚠️ Open commitments you forgot about
+🔴 Risk signals hidden in your notes
+💬 Questions tailored to that specific account
+
+Try it here → https://call-prep-uokh.vercel.app
+
+Built from scratch as part of my AI portfolio. #CustomerSuccess #CSM #AI #Productivity`;
+
+  const url = 'https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent('https://call-prep-uokh.vercel.app');
+  
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('share-btn');
+    btn.innerHTML = '✓ Caption copied — opening LinkedIn';
+    btn.style.background = 'var(--green-bg)';
+    btn.style.borderColor = 'var(--green-border)';
+    btn.style.color = 'var(--green-text)';
+    setTimeout(() => {
+      window.open(url, '_blank');
+      setTimeout(() => {
+        btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg> Share this tool';
+        btn.style.background = 'var(--accent-light)';
+        btn.style.borderColor = 'var(--accent-border)';
+        btn.style.color = 'var(--accent)';
+      }, 3000);
+    }, 800);
+  }).catch(() => {
+    window.open(url, '_blank');
+  });
 }
 </script>
 </body>
