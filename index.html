@@ -341,16 +341,18 @@ textarea::placeholder{color:var(--text-3);font-style:italic;font-family:var(--fo
 
 <div class="header">
   <div class="header-inner">
-    <div style="display:flex;align-items:center;gap:14px;">
-      <svg width="36" height="36" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;border-radius:8px;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <svg width="26" height="26" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;border-radius:7px;">
         <defs><linearGradient id="dg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6366f1"/><stop offset="1" stop-color="#3b82f6"/></linearGradient></defs>
         <rect width="32" height="32" rx="8" fill="url(#dg)"/>
         <text x="7" y="24" font-family="Georgia,serif" font-size="22" font-weight="700" fill="white">D</text>
       </svg>
       <div>
-        <div class="header-title">Debrief</div>
-        <div class="header-sub">AI pre-call brief · Built for CSMs</div>
-        <div class="header-badge">
+        <div style="display:flex;align-items:baseline;gap:10px;">
+          <div class="header-title">Debrief</div>
+          <div class="header-sub" style="margin:0;">AI pre-call brief · Built for CSMs</div>
+        </div>
+        <div class="header-badge" style="margin-top:5px;">
           <span class="badge-dot"></span>
           Paste notes · Get your brief in 30 seconds
         </div>
@@ -398,6 +400,15 @@ textarea::placeholder{color:var(--text-3);font-style:italic;font-family:var(--fo
       </div>
     </div>
 
+    <div id="paste-tip" style="display:none;background:var(--surface-2);border:1px solid var(--accent-border);border-radius:var(--radius-sm);padding:10px 14px;font-size:12px;color:var(--text-2);line-height:1.7;">
+      <strong style="color:var(--text);font-size:12px;">Paste any of these:</strong><br>
+      · Raw call notes from your CRM or Notion<br>
+      · Copy-pasted email threads with the client<br>
+      · Support ticket descriptions<br>
+      · Slack messages about the account<br>
+      <span style="color:var(--text-3);font-size:11px;margin-top:4px;display:block;">Dates like "3 Apr" help the AI build the timeline. No formatting needed.</span>
+    </div>
+
     <!-- UPDATE BANNER -->
     <div class="update-banner" id="update-banner">
       <span>📎</span>
@@ -407,7 +418,10 @@ textarea::placeholder{color:var(--text-3);font-style:italic;font-family:var(--fo
     <!-- NOTES — main focus, takes max space -->
     <div style="display:flex;flex-direction:column;flex:1;min-height:0;">
       <div class="notes-label-row">
-        <div class="section-label" style="margin-bottom:0;">Your notes</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="section-label" style="margin-bottom:0;">Your notes</div>
+          <span onclick="togglePasteTip()" style="font-size:11px;color:var(--accent);cursor:pointer;font-family:var(--font-heading);border-bottom:1px dashed var(--accent-border);">what to paste?</span>
+        </div>
         <div class="notes-actions">
           <span class="saved-indicator" id="saved-indicator">✓ Saved</span>
           <button onclick="resetNotes()" style="font-size:11px;padding:2px 8px;border-radius:var(--radius-sm);border:1px solid var(--border);background:transparent;color:var(--text-3);cursor:pointer;font-family:var(--font-heading);transition:all .15s;" onmouseover="this.style.color='var(--red-text)';this.style.borderColor='var(--red)'" onmouseout="this.style.color='var(--text-3)';this.style.borderColor='var(--border)'">✕ Clear</button>
@@ -417,14 +431,22 @@ textarea::placeholder{color:var(--text-3);font-style:italic;font-family:var(--fo
       <textarea
         id="f-notes"
         style="flex:1;min-height:300px;height:100%;"
-        placeholder="Paste everything you have — call notes, emails, tickets, Slack messages. Dates help but aren't required. The messier, the better.
+        placeholder="Paste everything — call notes, emails, tickets, Slack threads. No formatting needed.
 
-Example:
-14 Mar — call with Sarah, frustrated about slow API.
-15 Mar — I promised to follow up before end of month.
-22 Mar — email from Sarah, no reply from me yet..."
+Good examples of what to paste:
+· "Apr 3 — call with Marc, usage at 23%, SSO still broken"
+· Forwarded email thread with the client
+· Support ticket descriptions
+· Your own messy notes from a call
+· CRM activity log copy-pasted
+
+Dates help the AI build the timeline, but even rough notes work."
         oninput="onNotesChange()"
       ></textarea>
+      <div style="font-size:11px;color:var(--text-3);margin-top:6px;display:flex;align-items:center;gap:5px;">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Your notes never leave your browser. No data is stored on our servers.
+      </div>
     </div>
 
     <!-- GENERATE — primary CTA, always visible -->
@@ -565,6 +587,31 @@ Example:
   </div>
 </div>
 
+<!-- TRANSCRIPT MODAL -->
+<div id="transcript-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:center;justify-content:center;padding:24px;">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px 32px;max-width:560px;width:100%;box-shadow:0 24px 64px rgba(0,0,0,.6);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div style="font-family:var(--font-heading);font-size:16px;font-weight:600;color:var(--text);">Paste your call transcript</div>
+      <button onclick="closeTranscriptModal()" style="background:transparent;border:none;color:var(--text-3);cursor:pointer;font-size:20px;line-height:1;padding:2px 6px;border-radius:4px;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text-3)'">×</button>
+    </div>
+    <div style="font-size:13px;color:var(--text-2);margin-bottom:12px;line-height:1.6;">Paste any call transcript, meeting notes, or recording summary. The AI will extract decisions, commitments, and next steps.</div>
+    <textarea id="transcript-input" style="width:100%;min-height:180px;font-family:var(--font-mono);font-size:12.5px;line-height:1.7;padding:12px;border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);background:var(--surface-2);outline:none;resize:vertical;" placeholder="Paste transcript or notes here...
+      
+Example:
+[10:02] Sarah: The SSO issue is really blocking our team.
+[10:05] Tom: I'll follow up with engineering by Friday.
+[10:12] Sarah: We need to see progress before the renewal decision..."></textarea>
+    <div style="display:flex;gap:10px;margin-top:14px;justify-content:flex-end;">
+      <button onclick="closeTranscriptModal()" style="font-family:var(--font-heading);font-size:13px;padding:9px 18px;border-radius:var(--radius-sm);border:1px solid var(--border);background:transparent;color:var(--text-2);cursor:pointer;">Cancel</button>
+      <button onclick="submitTranscript()" style="font-family:var(--font-heading);font-size:13px;font-weight:600;padding:9px 20px;border-radius:var(--radius-sm);border:none;background:linear-gradient(135deg,var(--accent-hover),var(--accent));color:white;cursor:pointer;box-shadow:0 4px 14px rgba(99,102,241,.3);">Summarize call →</button>
+    </div>
+    <div style="font-size:11px;color:var(--text-3);margin-top:10px;display:flex;align-items:center;gap:5px;">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      Your transcript is sent to the AI and not stored anywhere.
+    </div>
+  </div>
+</div>
+
 <!-- FOOTER -->
 <div style="background:var(--surface);border-top:1px solid var(--border);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
   <div style="display:flex;align-items:center;gap:8px;">
@@ -633,8 +680,14 @@ async function draftFollowUp() {
 async function summarizeCall() {
   var btn = event.target.closest('button');
   var origText = btn.innerHTML;
+  openTranscriptModal();
+  window._summaryBtn = btn;
+  window._summaryOrigText = origText;
+}
 
-  var transcript = prompt('Paste your call transcript or notes here:');
+async function runSummarizeCall(transcript) {
+  var btn = window._summaryBtn;
+  var origText = window._summaryOrigText;
   if (!transcript || !transcript.trim()) return;
 
   btn.disabled = true;
@@ -674,6 +727,23 @@ async function summarizeCall() {
 
   btn.disabled = false;
   btn.innerHTML = origText;
+}
+
+function openTranscriptModal() {
+  document.getElementById('transcript-modal').style.display = 'flex';
+  document.getElementById('transcript-input').value = '';
+  document.getElementById('transcript-input').focus();
+}
+
+function closeTranscriptModal() {
+  document.getElementById('transcript-modal').style.display = 'none';
+}
+
+async function submitTranscript() {
+  var text = document.getElementById('transcript-input').value.trim();
+  if (!text) return;
+  closeTranscriptModal();
+  await runSummarizeCall(text);
 }
 
 function showExtra(title, content) {
@@ -813,6 +883,11 @@ function loadAccount(key) {
 }
 
 // ── RESET NOTES ──
+function togglePasteTip() {
+  var tip = document.getElementById('paste-tip');
+  tip.style.display = tip.style.display === 'none' ? 'block' : 'none';
+}
+
 function resetNotes() {
   document.getElementById('f-notes').value = '';
   document.getElementById('char-count').textContent = '0 chars';
