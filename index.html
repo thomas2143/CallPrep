@@ -51,7 +51,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
 
 /* LAYOUT */
 .main{display:grid;grid-template-columns:380px 1fr;gap:0;min-height:calc(100vh - 88px);}
-.panel-left{background:var(--surface);border-right:1px solid var(--border);padding:24px;display:flex;flex-direction:column;gap:14px;overflow-y:auto;height:calc(100vh - 73px);position:sticky;top:0;}
+.panel-left{background:var(--surface);border-right:1px solid var(--border);padding:24px;display:flex;flex-direction:column;gap:14px;overflow-y:auto;height:calc(100vh - 73px);position:sticky;top:0;min-height:0;}
 .panel-right{padding:28px;overflow-y:auto;background:var(--bg);}
 
 .section-label{font-family:var(--font-heading);font-size:11px;font-weight:600;color:var(--text-3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;}
@@ -416,7 +416,7 @@ textarea::placeholder{color:var(--text-3);font-style:italic;font-family:var(--fo
     </div>
 
     <!-- NOTES — main focus, takes max space -->
-    <div style="display:flex;flex-direction:column;flex:1;min-height:0;">
+    <div style="display:flex;flex-direction:column;flex:1;min-height:180px;overflow:hidden;">
       <div class="notes-label-row">
         <div style="display:flex;align-items:center;gap:8px;">
           <div class="section-label" style="margin-bottom:0;">Your notes</div>
@@ -430,7 +430,7 @@ textarea::placeholder{color:var(--text-3);font-style:italic;font-family:var(--fo
       </div>
       <textarea
         id="f-notes"
-        style="flex:1;min-height:300px;height:100%;"
+        style="flex:1;min-height:120px;height:100%;"
         placeholder="Paste everything — call notes, emails, tickets, Slack threads. No formatting needed.
 
 Good examples of what to paste:
@@ -470,6 +470,8 @@ Dates help the AI build the timeline, but even rough notes work."
       </div>
       <button class="new-account-btn" style="margin-top:8px;" onclick="newAccount()">+ New account</button>
     </div>
+
+    <div id="session-list-wrap" style="display:none;"></div>
 
     <div class="divider"></div>
 
@@ -718,9 +720,71 @@ function loadAccount(key) {
     document.getElementById('update-banner').classList.add('visible');
   }
 
+  renderSessionList(key);
   renderAccountList();
   document.getElementById('output').classList.remove('visible');
   document.getElementById('empty-state').style.display = '';
+}
+
+// ── SESSION LIST ──
+function renderSessionList(accountKey) {
+  var wrap = document.getElementById('session-list-wrap');
+  if (!wrap) return;
+  var accounts = getAccounts();
+  var acc = accounts[accountKey];
+  if (!acc || !acc.sessions || acc.sessions.length === 0) {
+    wrap.innerHTML = '';
+    wrap.style.display = 'none';
+    return;
+  }
+  wrap.style.display = 'block';
+  wrap.innerHTML = '';
+  var label = document.createElement('div');
+  label.className = 'section-label';
+  label.style.marginBottom = '6px';
+  label.textContent = 'Sessions (' + acc.sessions.length + ')';
+  wrap.appendChild(label);
+  acc.sessions.forEach(function(s, i) {
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--radius-sm);background:var(--surface-2);border:1px solid var(--border);margin-bottom:4px;';
+    var info = document.createElement('div');
+    info.style.cssText = 'flex:1;min-width:0;';
+    var dateDiv = document.createElement('div');
+    dateDiv.style.cssText = 'font-size:12px;font-weight:500;color:var(--text);';
+    dateDiv.textContent = s.date || ('Session ' + (i+1));
+    var previewDiv = document.createElement('div');
+    previewDiv.style.cssText = 'font-size:11px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
+    previewDiv.textContent = s.notes.substring(0, 45).trim() + '...';
+    info.appendChild(dateDiv);
+    info.appendChild(previewDiv);
+    var btn = document.createElement('button');
+    btn.textContent = '×';
+    btn.style.cssText = 'flex-shrink:0;width:20px;height:20px;border-radius:3px;border:none;background:transparent;color:var(--text-3);cursor:pointer;font-size:13px;';
+    btn.addEventListener('mouseenter', function(){ this.style.color = 'var(--red-text)'; this.style.background = 'var(--red-bg)'; });
+    btn.addEventListener('mouseleave', function(){ this.style.color = 'var(--text-3)'; this.style.background = 'transparent'; });
+    (function(idx){ btn.addEventListener('click', function(e){ e.stopPropagation(); deleteSession(accountKey, idx); }); })(i);
+    row.appendChild(info);
+    row.appendChild(btn);
+    wrap.appendChild(row);
+  });
+}
+function deleteSession(accountKey, sessionIndex) {
+  var accounts = getAccounts();
+  var acc = accounts[accountKey];
+  if (!acc) return;
+  acc.sessions.splice(sessionIndex, 1);
+  acc.updatedAt = new Date().toISOString();
+  saveAccounts(accounts);
+  // Reload notes without deleted session
+  var allNotes = acc.sessions.map(function(s, i) {
+    var label = s.date ? ('\n--- Session '+(i+1)+' ('+s.date+') ---\n') : ('\n--- Session '+(i+1)+' ---\n');
+    return label + s.notes;
+  }).join('\n');
+  document.getElementById('f-notes').value = allNotes;
+  document.getElementById('char-count').textContent = allNotes.length + ' chars';
+  renderSessionList(accountKey);
+  renderAccountList();
+  buildWatchlist();
 }
 
 // ── RESET NOTES ──
