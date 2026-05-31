@@ -1,4 +1,4 @@
-+<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -649,59 +649,27 @@ async function draftFollowUp() {
   var callType = document.getElementById('f-calltype').value;
 
   try {
-    var resp = await fetch('/api/call-prep', {
+    var resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer GROQ_API_KEY' },
       body: JSON.stringify({
-        notes: 'Draft a professional follow-up email after a ' + callType + ' call with ' + account + '. Open commitments: ' + commitments + '. Risk signals: ' + risks + '. Next steps discussed: ' + nextSteps,
-        account: account,
-        callType: 'follow_up_email',
-        mode: 'email'
+        model: 'llama-3.3-70b-versatile',
+        max_tokens: 2000,
+        temperature: 0.1,
+        messages: [{ role: 'user', content: buildCallPrepPrompt(notes, account, callType) }]
       })
     });
-    var data = await resp.json();
-    var emailText = data.dont_forget || data.account_read || '';
-
-    var resp2 = await fetch('/api/followup', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ account: account, callType: callType, commitments: commitments, risks: risks, nextSteps: nextSteps })
-    });
-    var d2 = await resp2.json();
-    showExtra('Follow-up email draft — ' + account, d2.email || 'Could not generate email.');
-  } catch(e) {
-    showExtra('Error', e.message);
-  }
-
-  btn.disabled = false;
-  btn.innerHTML = origText;
-}
-
-async function summarizeCall() {
-  var btn = event.target.closest('button');
-  var origText = btn.innerHTML;
-  openTranscriptModal();
-  window._summaryBtn = btn;
-  window._summaryOrigText = origText;
-}
-
-async function runSummarizeCall(transcript) {
-  var btn = window._summaryBtn;
-  var origText = window._summaryOrigText;
-  if (!transcript || !transcript.trim()) return;
-
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner" style="border-color:rgba(255,255,255,.2);border-top-color:var(--text-2);width:13px;height:13px;border-width:2px;display:inline-block;border-radius:50%;animation:spin .7s linear infinite;vertical-align:-2px;margin-right:6px;"></span> Summarizing...';
-
-  var account = document.getElementById('f-account').value || document.getElementById('out-account').textContent || 'Account';
-
-  try {
-    var resp = await fetch('/api/call-summary', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ transcript: transcript, account: account })
-    });
-    var data = await resp.json();
+    var groqJson = await resp.json();
+    var rawText = groqJson.choices && groqJson.choices[0] ? groqJson.choices[0].message.content : '';
+    var clean = rawText.replace(/```json|```/g, '').trim();
+    var data;
+    try { data = JSON.parse(clean); }
+    catch(e) {
+      var op = (clean.match(/\{/g)||[]).length, cl = (clean.match(/\}/g)||[]).length;
+      var rec = clean.replace(/,\s*\]/g,']').replace(/,\s*\}/g,'}');
+      for(var i=0;i<op-cl;i++) rec+='}';
+      data = JSON.parse(rec);
+    }
     if (data.error) throw new Error(data.error);
     var text = 'DECISIONS MADE:\n' + (data.decisions||[]).join('\n') + '\n\nCOMMITMENTS TAKEN:\n' + (data.commitments||[]).join('\n') + '\n\nNEXT STEPS:\n' + (data.next_steps||[]).join('\n') + '\n\nKEY QUOTE:\n' + (data.key_quote||'');
     showExtra('Call summary — ' + account, text);
@@ -814,6 +782,28 @@ Built from scratch as part of my AI portfolio. #CustomerSuccess #CSM #AI #Produc
 </script>
 
 <script>
+
+// ── GROQ DIRECT CALL ──
+var GROQ_KEY = "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";
+
+async function groqCall(prompt, maxTokens) {
+  var resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + GROQ_KEY },
+    body: JSON.stringify({ model: 'llama-3.3-70b-versatile', max_tokens: maxTokens || 2000, temperature: 0.1, messages: [{ role: 'user', content: prompt }] })
+  });
+  var json = await resp.json();
+  var text = json.choices && json.choices[0] ? json.choices[0].message.content : '';
+  var clean = text.replace(/```json|```/g, '').trim();
+  try { return JSON.parse(clean); }
+  catch(e) {
+    var op = (clean.match(/\{/g)||[]).length, cl = (clean.match(/\}/g)||[]).length;
+    var rec = clean.replace(/,\s*\]/g,']').replace(/,\s*\}/g,'}');
+    for(var i=0;i<op-cl;i++) rec+='}';
+    return JSON.parse(rec);
+  }
+}
+
 const API_URL = '/api/call-prep';
 const STORAGE_KEY = 'callprep_accounts';
 const TYPE_ICONS = {call:'📞',email:'✉️',ticket:'🎫',commitment:'🤝',win:'✅',risk:'⚠️'};
@@ -1031,13 +1021,8 @@ async function generate() {
   btn.innerHTML = '<span class="spinner"></span> Analyzing...';
 
   try {
-    const resp = await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ notes, account, callType })
-    });
-
-    const data = await resp.json();
+    var callPrepPrompt = 'You are a senior Customer Success Manager. Analyze the notes and return ONLY valid JSON, no markdown, no backticks.\n\nACCOUNT: ' + account + '\nCALL TYPE: ' + callType + '\n\nNOTES:\n' + notes.slice(0, 8000) + '\n\nReturn this exact JSON:\n{"account_name":"string","call_type":"string","account_read":"2-3 sentences honest CSM reading","timeline":[{"date":"string","type":"call|email|ticket|commitment|win|risk","title":"max 6 words","detail":"one sentence","flag":"open_commitment|risk|win|neutral"}],"open_commitments":[{"what":"string","promised_on":"string","promised_by":"CSM|client|unknown","status":"overdue|pending|unclear","urgency":"high|medium|low"}],"risk_signals":[{"signal":"string","why_it_matters":"one sentence"}],"questions_to_ask":[{"question":"specific question for this account","why":"one sentence"}],"dont_forget":"single most important thing for this call"}';
+    const data = await groqCall(callPrepPrompt, 2000);
     if (data.error) throw new Error(data.error);
 
     // Header
@@ -1167,13 +1152,8 @@ async function buildWatchlist() {
   var today = new Date().toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
 
   try {
-    var resp = await fetch('/api/watchlist', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ accountSummaries: accountSummaries, today: today })
-    });
-
-    var data = await resp.json();
+    var watchlistPrompt = 'You are a senior CSM analyzing a portfolio. Based on these account notes, identify which accounts need attention THIS WEEK. Today is ' + today + '. ACCOUNTS: ' + accountSummaries.slice(0, 8000) + '. Return ONLY valid JSON: {"watchlist":[{"account":"name","priority":"high|medium|low","reason":"specific signal from notes","action":"concrete action max 8 words"}]}. Sort by priority high first. high=renewal risk/escalation/sponsor change/overdue commitment. medium=no recent contact/renewal in 30-60 days. low=healthy.';
+    var data = await groqCall(watchlistPrompt, 1000);
     if (data.error) throw new Error(data.error);
 
     var list = data.watchlist || [];
