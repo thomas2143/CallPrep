@@ -107,6 +107,8 @@ textarea::placeholder{color:var(--text-3);font-style:italic;font-family:var(--fo
 .gen-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
 .spinner{display:inline-block;width:15px;height:15px;border:2.5px solid rgba(255,255,255,.35);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulseCta{0%,100%{box-shadow:0 4px 20px rgba(99,102,241,.35)}50%{box-shadow:0 4px 32px rgba(99,102,241,.7),0 0 0 4px rgba(99,102,241,.2)}}
+.pulse-cta{animation:pulseCta 1.5s ease-in-out 3;}
 
 /* EMPTY STATE */
 .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;min-height:400px;text-align:center;gap:10px;}
@@ -389,7 +391,7 @@ textarea::placeholder{color:var(--text-3);font-style:italic;font-family:var(--fo
 
 <div class="header">
   <div class="header-inner">
-    <div style="display:flex;align-items:center;gap:12px;">
+    <a href="/landing.html" style="display:flex;align-items:center;gap:12px;text-decoration:none;transition:opacity .15s;" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
       <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;border-radius:8px;">
         <defs><linearGradient id="dg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6366f1"/><stop offset="1" stop-color="#3b82f6"/></linearGradient></defs>
         <rect width="32" height="32" rx="8" fill="url(#dg)"/>
@@ -406,7 +408,7 @@ textarea::placeholder{color:var(--text-3);font-style:italic;font-family:var(--fo
           <span style="font-size:11px;color:var(--text-3);font-family:var(--font-heading);">Paste notes · Get your brief in 30 seconds</span>
         </div>
       </div>
-    </div>
+    </a>
   </div>
 </div>
 
@@ -447,6 +449,14 @@ textarea::placeholder{color:var(--text-3);font-style:italic;font-family:var(--fo
           <option value="Expansion">Expansion</option>
         </select>
       </div>
+    </div>
+
+    <!-- CONTEXT FIELD -->
+    <div class="form-group">
+      <label style="display:flex;align-items:center;gap:6px;">
+        Context <span style="font-size:10px;color:var(--text-3);font-weight:400;">(optional — helps the AI)</span>
+      </label>
+      <input type="text" id="f-context" placeholder="e.g. renewal in 30 days, new CFO, post-acquisition, high season..." style="font-size:12px;" />
     </div>
 
     <div id="paste-tip" style="display:none;background:var(--surface-2);border:1px solid var(--accent-border);border-radius:var(--radius-sm);padding:10px 14px;font-size:12px;color:var(--text-2);line-height:1.7;">
@@ -549,22 +559,32 @@ The AI handles the mess — that's the point."
   <div class="panel-right">
 
     <div class="empty-state" id="empty-state">
-      <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" style="opacity:.2;margin-bottom:4px;">
-        <rect x="10" y="8" width="44" height="56" rx="6" fill="none" stroke="var(--text)" stroke-width="2.5"/>
-        <line x1="20" y1="24" x2="44" y2="24" stroke="var(--text)" stroke-width="2" stroke-linecap="round"/>
-        <line x1="20" y1="32" x2="44" y2="32" stroke="var(--text)" stroke-width="2" stroke-linecap="round"/>
-        <line x1="20" y1="40" x2="36" y2="40" stroke="var(--text)" stroke-width="2" stroke-linecap="round"/>
-        <circle cx="58" cy="54" r="14" fill="var(--accent)" opacity=".15"/>
-        <circle cx="58" cy="54" r="14" fill="none" stroke="var(--accent)" stroke-width="2"/>
-        <path d="M53 54l3.5 3.5L63 49" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-      <div class="empty-title">Your brief will appear here</div>
-      <div class="empty-sub">Paste everything you have on this account — emails, call notes, tickets, Slack messages. The more you paste, the better the brief.</div>
-      <div class="empty-steps">
-        <div class="empty-step"><div class="empty-step-num">1</div><div>Paste notes — calls, emails, tickets, anything</div></div>
-        <div class="empty-step"><div class="empty-step-num">2</div><div>Save the account to build its history over time</div></div>
-        <div class="empty-step"><div class="empty-step-num">3</div><div>Next quarter, add new notes — the AI sees the full picture</div></div>
+      <div style="font-size:32px;margin-bottom:8px;">👋</div>
+      <div class="empty-title" style="font-size:20px;">Welcome to Debrief</div>
+      <div class="empty-sub" style="margin-bottom:28px;">Your AI pre-call brief — 3 steps, less than 1 minute.</div>
+
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:100%;max-width:580px;margin-bottom:28px;">
+        <div style="background:var(--green-bg);border:1px solid var(--green-border);border-radius:var(--radius);padding:20px 16px;text-align:center;">
+          <div style="font-size:24px;margin-bottom:10px;">🔴</div>
+          <div style="font-family:var(--font-heading);font-size:13px;font-weight:600;color:var(--green-text);margin-bottom:6px;">1. Demo loaded</div>
+          <div style="font-size:12px;color:var(--text-2);line-height:1.5;">Nova Corp is pre-loaded on the left — an at-risk account</div>
+        </div>
+        <div style="background:var(--accent-light);border:1px solid var(--accent-border);border-radius:var(--radius);padding:20px 16px;text-align:center;">
+          <div style="font-size:24px;margin-bottom:10px;">✦</div>
+          <div style="font-family:var(--font-heading);font-size:13px;font-weight:600;color:var(--accent);margin-bottom:6px;">2. Click Generate</div>
+          <div style="font-size:12px;color:var(--text-2);line-height:1.5;">See what Debrief extracts in 30 seconds</div>
+        </div>
+        <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);padding:20px 16px;text-align:center;">
+          <div style="font-size:24px;margin-bottom:10px;">📋</div>
+          <div style="font-family:var(--font-heading);font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:6px;">3. Use your notes</div>
+          <div style="font-size:12px;color:var(--text-2);line-height:1.5;">Clear the demo and paste your own account notes</div>
+        </div>
       </div>
+
+      <button onclick="loadDemo('atrisk'); document.getElementById('gen-btn').classList.add('pulse-cta');" style="font-family:var(--font-heading);font-size:14px;font-weight:600;padding:12px 28px;border-radius:var(--radius);border:none;background:linear-gradient(135deg,var(--accent-hover),var(--accent));color:white;cursor:pointer;box-shadow:0 4px 20px rgba(99,102,241,.35);transition:all .2s;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='none'">
+        Load demo &amp; try it →
+      </button>
+      <div style="font-size:12px;color:var(--text-3);margin-top:12px;">or paste your own notes on the left</div>
     </div>
 
     <div class="output" id="output">
@@ -583,9 +603,9 @@ The AI handles the mess — that's the point."
         <div class="brief-read" id="out-read"></div>
       </div>
 
-      <div id="history-strip-wrap"></div>
-
       <div id="sentiment-card-wrap"></div>
+
+      <div id="history-strip-wrap"></div>
 
       <div style="display:flex;gap:10px;flex-wrap:wrap;" id="post-brief-actions">
         <button onclick="draftFollowUp()" style="font-family:var(--font-heading);font-size:13px;font-weight:500;padding:9px 18px;border-radius:var(--radius-sm);border:1px solid var(--accent-border);background:var(--accent-light);color:var(--accent);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px;" onmouseover="this.style.background='rgba(99,102,241,.25)'" onmouseout="this.style.background='var(--accent-light)'">
@@ -702,7 +722,7 @@ Example:
     <span style="color:var(--border-2);">·</span>
     <span style="font-size:12px;color:var(--text-3);">Customer Success Manager</span>
     <span style="color:var(--border-2);">·</span>
-    <a href="/landing.html" target="_blank" style="font-size:12px;color:var(--text-3);text-decoration:none;transition:color .15s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-3)'">What is Debrief?</a>
+    <a href="/landing.html" style="font-size:12px;color:var(--text-3);text-decoration:none;transition:color .15s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-3)'">About Debrief →</a>
   </div>
   <button id="share-btn" onclick="shareToolLinkedIn()" style="font-family:var(--font-heading);font-size:12px;font-weight:500;padding:7px 16px;border-radius:var(--radius-sm);border:1px solid var(--accent-border);background:var(--accent-light);color:var(--accent);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px;" onmouseover="this.style.background='rgba(99,102,241,.25)'" onmouseout="this.style.background='var(--accent-light)'">
     <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
@@ -788,6 +808,7 @@ function loadAccount(key) {
 
   document.getElementById('f-notes').value = allNotes;
   document.getElementById('char-count').textContent = allNotes.length + ' chars';
+  if (acc.lastContext) document.getElementById('f-context').value = acc.lastContext;
 
   if (acc.sessions && acc.sessions.length > 0) {
     document.getElementById('update-banner').classList.add('visible');
@@ -855,6 +876,7 @@ function deleteSession(accountKey, sessionIndex) {
   }).join('\n');
   document.getElementById('f-notes').value = allNotes;
   document.getElementById('char-count').textContent = allNotes.length + ' chars';
+  if (acc.lastContext) document.getElementById('f-context').value = acc.lastContext;
   renderSessionList(accountKey);
   renderAccountList();
   buildWatchlist();
@@ -877,6 +899,7 @@ function resetNotes() {
 function newAccount() {
   document.getElementById('f-account').value = '';
   document.getElementById('f-notes').value = '';
+  document.getElementById('f-context').value = '';
   document.getElementById('char-count').textContent = '0 chars';
   document.getElementById('update-banner').classList.remove('visible');
   document.getElementById('saved-indicator').classList.remove('visible');
@@ -911,8 +934,10 @@ function saveCurrentAccount() {
     return;
   }
 
-  accounts[key].sessions.push({ notes, date: today });
+  const context = document.getElementById('f-context').value.trim();
+  accounts[key].sessions.push({ notes, date: today, context: context });
   accounts[key].callType = callType;
+  accounts[key].lastContext = context;
   accounts[key].updatedAt = new Date().toISOString();
   saveAccounts(accounts);
 
@@ -1086,7 +1111,9 @@ async function generate() {
   btn.innerHTML = '<span class="spinner"></span> Analyzing...';
 
   try {
-    var p1 = 'You are a senior CSM. Analyze notes and return ONLY valid JSON no markdown. ACCOUNT: '+account+' CALL TYPE: '+callType+' NOTES: '+notes.slice(0,8000)+' Return: {"account_name":"","call_type":"","account_read":"2-3 sentence CSM reading of this account","sentiment":"positive|neutral|concerned|at-risk","sentiment_reason":"one sentence explaining the detected sentiment based on specific signals in the notes","opening_line":"the perfect first sentence to say when the call starts — tailored to the sentiment and account context. If at-risk: empathetic and direct. If positive: warm and forward-looking. If expansion: ambitious. Max 25 words.","timeline":[{"date":"","type":"call|email|ticket|commitment|win|risk","title":"max 6 words","detail":"one sentence","flag":"open_commitment|risk|win|neutral"}],"open_commitments":[{"what":"","promised_on":"","promised_by":"CSM|client|unknown","status":"overdue|pending|unclear","urgency":"high|medium|low"}],"risk_signals":[{"signal":"","why_it_matters":"one sentence"}],"questions_to_ask":[{"question":"","why":""}],"dont_forget":"most important thing for this call"}';
+    var context = document.getElementById('f-context').value.trim();
+    var contextStr = context ? ' ADDITIONAL CONTEXT: '+context : '';
+    var p1 = 'You are a senior CSM. Analyze notes and return ONLY valid JSON no markdown. ACCOUNT: '+account+' CALL TYPE: '+callType+contextStr+' NOTES: '+notes.slice(0,8000)+' Return: {"account_name":"","call_type":"","account_read":"2-3 sentence CSM reading of this account","sentiment":"positive|neutral|concerned|at-risk","sentiment_reason":"one sentence explaining the detected sentiment based on specific signals in the notes","opening_line":"the perfect first sentence to say when the call starts — tailored to the sentiment and account context. If at-risk: empathetic and direct. If positive: warm and forward-looking. If expansion: ambitious. Max 25 words.","timeline":[{"date":"","type":"call|email|ticket|commitment|win|risk","title":"max 6 words","detail":"one sentence","flag":"open_commitment|risk|win|neutral"}],"open_commitments":[{"what":"","promised_on":"","promised_by":"CSM|client|unknown","status":"overdue|pending|unclear","urgency":"high|medium|low"}],"risk_signals":[{"signal":"","why_it_matters":"one sentence"}],"questions_to_ask":[{"question":"","why":""}],"dont_forget":"most important thing for this call"}';
     const data = await groqCall(p1, 2000);
     if (data.error) throw new Error(data.error);
 
@@ -1257,7 +1284,19 @@ async function buildWatchlist() {
       var badge = item.priority === 'high' ? '🔴 Urgent' : item.priority === 'medium' ? '🟡 Watch' : '🟢 Healthy';
       var div = document.createElement('div');
       div.className = 'wl-card priority-' + item.priority;
-      div.innerHTML = '<div class="wl-card-top"><div class="wl-card-name">' + item.account + '</div><span class="wl-badge ' + item.priority + '">' + badge + '</span></div><div class="wl-reason">' + item.reason + '</div><div class="wl-action">→ ' + item.action + '</div>';
+
+      // Calculate last brief age
+      var accs = getAccounts();
+      var accKey = item.account.toLowerCase();
+      var accData = accs[accKey];
+      var lastBriefHtml = '';
+      if (accData && accData.updatedAt) {
+        var daysSince = Math.floor((Date.now() - new Date(accData.updatedAt)) / (1000*60*60*24));
+        var briefColor = daysSince > 30 ? 'var(--red-text)' : daysSince > 14 ? 'var(--amber-text)' : 'var(--text-3)';
+        lastBriefHtml = '<div style="font-size:10px;margin-top:5px;color:' + briefColor + ';">Last activity: ' + (daysSince === 0 ? 'today' : daysSince + ' days ago') + (daysSince > 30 ? ' ⚠️' : '') + '</div>';
+      }
+
+      div.innerHTML = '<div class="wl-card-top"><div class="wl-card-name">' + item.account + '</div><span class="wl-badge ' + item.priority + '">' + badge + '</span></div><div class="wl-reason">' + item.reason + '</div><div class="wl-action">→ ' + item.action + '</div>' + lastBriefHtml;
       var accountKey = item.account.toLowerCase();
       div.addEventListener('click', function(k){ return function(){ loadAccount(k); }; }(accountKey));
       return div;
@@ -1303,11 +1342,16 @@ function setupPrint() {
 }
 setupPrint();
 
-// Show onboarding only on first visit
+// Show onboarding overlay only on first visit
 if (!localStorage.getItem('callprep_onboarded')) {
   document.getElementById('onboarding-overlay').classList.remove('hidden');
 } else {
   document.getElementById('onboarding-overlay').classList.add('hidden');
+  // On return visits with no saved accounts, pre-load the at-risk demo silently
+  var existingAccounts = getAccounts();
+  if (Object.keys(existingAccounts).length === 0) {
+    loadDemo('atrisk');
+  }
 }
 
 // ── INIT ──
