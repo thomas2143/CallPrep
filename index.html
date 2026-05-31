@@ -389,20 +389,21 @@ textarea::placeholder{color:var(--text-3);font-style:italic;font-family:var(--fo
 
 <div class="header">
   <div class="header-inner">
-    <div style="display:flex;align-items:center;gap:10px;">
-      <svg width="26" height="26" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;border-radius:7px;">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;border-radius:8px;">
         <defs><linearGradient id="dg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6366f1"/><stop offset="1" stop-color="#3b82f6"/></linearGradient></defs>
         <rect width="32" height="32" rx="8" fill="url(#dg)"/>
         <text x="7" y="24" font-family="Georgia,serif" font-size="22" font-weight="700" fill="white">D</text>
       </svg>
       <div>
-        <div style="display:flex;align-items:baseline;gap:10px;">
+        <div style="display:flex;align-items:center;gap:12px;">
           <div class="header-title">Debrief</div>
-          <div class="header-sub" style="margin:0;">AI pre-call brief · Built for CSMs</div>
+          <div style="width:1px;height:16px;background:var(--border-2);"></div>
+          <div class="header-sub" style="margin:0;font-size:12px;">AI pre-call brief for CSMs</div>
         </div>
-        <div class="header-badge" style="margin-top:5px;">
+        <div style="display:flex;align-items:center;gap:5px;margin-top:3px;">
           <span class="badge-dot"></span>
-          Paste notes · Get your brief in 30 seconds
+          <span style="font-size:11px;color:var(--text-3);font-family:var(--font-heading);">Paste notes · Get your brief in 30 seconds</span>
         </div>
       </div>
     </div>
