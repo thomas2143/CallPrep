@@ -40,26 +40,26 @@
 body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;}
 
 /* HEADER */
-.header{background:var(--surface);border-bottom:1px solid var(--border);padding:20px 32px;position:relative;overflow:hidden;}
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:18px 32px 16px;position:relative;overflow:hidden;}
 .header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(99,102,241,.06) 0%,transparent 60%);}
 .header-inner{position:relative;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
 .header-title{font-family:var(--font-heading);font-size:22px;font-weight:600;color:var(--text);letter-spacing:-.4px;}
 .header-sub{font-size:11px;color:var(--text-3);letter-spacing:1.2px;text-transform:uppercase;margin-top:2px;}
-.header-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:50px;padding:4px 12px;font-family:var(--font-heading);font-size:11px;color:var(--text-2);margin-top:6px;}
+.header-badge{display:inline-flex;align-items:center;gap:5px;background:transparent;border:none;border-radius:50px;padding:0;font-family:var(--font-heading);font-size:11px;color:var(--text-3);margin-top:4px;}
 .badge-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
 
 /* LAYOUT */
 .main{display:grid;grid-template-columns:380px 1fr;gap:0;min-height:calc(100vh - 88px);}
-.panel-left{background:var(--surface);border-right:1px solid var(--border);padding:24px;display:flex;flex-direction:column;gap:14px;overflow-y:auto;height:calc(100vh - 73px);position:sticky;top:0;}
-.panel-right{padding:28px;overflow-y:auto;background:var(--bg);}
+.panel-left{background:var(--surface);border-right:1px solid var(--border);padding:24px;display:flex;flex-direction:column;gap:14px;overflow-y:auto;height:calc(100vh - 73px);position:sticky;top:0;min-height:0;}
+.panel-right{padding:32px 36px;overflow-y:auto;background:var(--bg);}
 
-.section-label{font-family:var(--font-heading);font-size:11px;font-weight:600;color:var(--text-3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;}
+.section-label{font-family:var(--font-heading);font-size:11px;font-weight:600;color:var(--text-3);letter-spacing:1.4px;text-transform:uppercase;margin-bottom:10px;}
 .divider{border:none;border-top:1px solid var(--border);margin:2px 0;}
 
 /* SAVED ACCOUNTS */
 .accounts-list{display:flex;flex-direction:column;gap:6px;}
-.account-item{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface-2);cursor:pointer;transition:all .15s;}
+.account-item{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface-2);cursor:pointer;transition:all .2s cubic-bezier(.4,0,.2,1);}
 .account-item:hover{border-color:var(--accent-border);background:var(--accent-light);}
 .account-item.active{border-color:var(--accent-border);background:var(--accent-light);}
 .account-item-info{flex:1;min-width:0;}
@@ -102,11 +102,13 @@ textarea::placeholder{color:var(--text-3);font-style:italic;font-family:var(--fo
 .update-banner strong{font-weight:600;}
 
 /* GEN BTN */
-.gen-btn{width:100%;padding:12px;font-family:var(--font-heading);font-size:14px;font-weight:600;border-radius:var(--radius);border:none;background:linear-gradient(135deg,var(--accent-hover),var(--accent));color:white;cursor:pointer;transition:all .18s;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 20px rgba(99,102,241,.35);}
+.gen-btn{width:100%;padding:12px;font-family:var(--font-heading);font-size:14px;font-weight:600;border-radius:var(--radius);border:none;background:linear-gradient(135deg,var(--accent-hover),var(--accent));color:white;cursor:pointer;transition:all .25s cubic-bezier(.4,0,.2,1);display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 20px rgba(99,102,241,.35);}
 .gen-btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 28px rgba(99,102,241,.5);}
 .gen-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
 .spinner{display:inline-block;width:15px;height:15px;border:2.5px solid rgba(255,255,255,.35);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulseCta{0%,100%{box-shadow:0 4px 20px rgba(99,102,241,.35)}50%{box-shadow:0 4px 32px rgba(99,102,241,.7),0 0 0 4px rgba(99,102,241,.2)}}
+.pulse-cta{animation:pulseCta 1.5s ease-in-out 3;}
 
 /* EMPTY STATE */
 .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;min-height:400px;text-align:center;gap:10px;}
@@ -118,17 +120,17 @@ textarea::placeholder{color:var(--text-3);font-style:italic;font-family:var(--fo
 .empty-step-num{font-family:var(--font-heading);font-size:11px;font-weight:700;width:20px;height:20px;border-radius:50%;background:var(--surface-3);color:var(--text-2);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
 
 /* OUTPUT */
-.output{display:none;flex-direction:column;gap:20px;}
+.output{display:none;flex-direction:column;gap:16px;}
 .output.visible{display:flex;}
-.brief-head{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);padding:18px 20px;box-shadow:var(--shadow);}
-.brief-account{font-family:var(--font-heading);font-size:20px;font-weight:600;color:var(--text);letter-spacing:-.3px;}
+.brief-head{background:var(--surface);border-radius:var(--radius);border:none;padding:22px 24px;box-shadow:0 2px 12px rgba(0,0,0,.25),0 1px 3px rgba(0,0,0,.15);}
+.brief-account{font-family:var(--font-heading);font-size:22px;font-weight:600;color:var(--text);letter-spacing:-.4px;}
 .brief-meta{font-size:12px;color:var(--text-3);margin-top:3px;}
-.brief-read{font-size:14px;line-height:1.75;color:var(--text-2);margin-top:12px;padding-top:12px;border-top:1px solid var(--border);}
+.brief-read{font-size:15px;line-height:1.85;color:var(--text-2);margin-top:14px;padding-top:14px;border-top:1px solid var(--border);}
 .print-btn{font-family:var(--font-heading);font-size:12px;padding:6px 14px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface-2);color:var(--text-2);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:5px;flex-shrink:0;}
 .print-btn:hover{border-color:var(--accent-border);color:var(--accent);}
 
 /* HISTORY STRIP */
-.history-strip{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);padding:14px 18px;box-shadow:var(--shadow);}
+.history-strip{background:var(--surface);border-radius:var(--radius);border:none;padding:16px 20px;box-shadow:0 2px 12px rgba(0,0,0,.25),0 1px 3px rgba(0,0,0,.15);}
 .history-title{font-family:var(--font-heading);font-size:11px;font-weight:600;color:var(--text-3);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;}
 .history-items{display:flex;flex-direction:column;gap:6px;}
 .history-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:var(--radius-sm);background:var(--surface-2);border:1px solid var(--border);}
@@ -137,13 +139,13 @@ textarea::placeholder{color:var(--text-3);font-style:italic;font-family:var(--fo
 .history-count{font-size:11px;color:var(--text-3);}
 
 /* DONT FORGET */
-.dont-forget{background:var(--amber-bg);border:1px solid var(--amber-border);border-left:4px solid var(--amber);border-radius:var(--radius);padding:14px 18px;display:flex;gap:12px;align-items:flex-start;}
+.dont-forget{background:var(--amber-bg);border:none;border-left:4px solid var(--amber);border-radius:var(--radius);padding:16px 20px;display:flex;gap:12px;align-items:flex-start;box-shadow:0 2px 12px rgba(0,0,0,.2);}
 .df-label{font-family:var(--font-heading);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--amber-text);margin-bottom:4px;}
 .df-text{font-size:13.5px;line-height:1.65;color:var(--text);font-weight:500;}
 
 /* SECTION CARD */
-.section-card{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);padding:20px;box-shadow:var(--shadow);}
-.card-title{font-family:var(--font-heading);font-size:12px;font-weight:600;color:var(--text-3);letter-spacing:1px;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.section-card{background:var(--surface);border-radius:var(--radius);border:none;padding:24px;box-shadow:0 2px 12px rgba(0,0,0,.25),0 1px 3px rgba(0,0,0,.15);}
+.card-title{font-family:var(--font-heading);font-size:11px;font-weight:600;color:var(--text-3);letter-spacing:1.4px;text-transform:uppercase;margin-bottom:18px;display:flex;align-items:center;gap:8px;}
 
 /* TIMELINE */
 .timeline{display:flex;flex-direction:column;gap:0;position:relative;}
@@ -160,7 +162,7 @@ textarea::placeholder{color:var(--text-3);font-style:italic;font-family:var(--fo
 .tl-item:last-child .tl-content{border-bottom:none;}
 .tl-date{font-size:11px;color:var(--text-3);margin-bottom:2px;font-family:var(--font-heading);}
 .tl-title{font-size:13px;font-weight:500;color:var(--text);margin-bottom:2px;}
-.tl-detail{font-size:12px;color:var(--text-2);line-height:1.5;}
+.tl-detail{font-size:13px;color:var(--text-2);line-height:1.55;}
 .tl-flag{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:2px 8px;border-radius:50px;margin-top:4px;}
 .flag-open_commitment{background:var(--amber-bg);color:var(--amber-text);}
 .flag-risk{background:var(--red-bg);color:var(--red-text);}
@@ -182,14 +184,14 @@ textarea::placeholder{color:var(--text-3);font-style:italic;font-family:var(--fo
 /* RISKS */
 .risks{display:flex;flex-direction:column;gap:8px;}
 .risk-item{padding:12px 14px;border-radius:var(--radius-sm);background:var(--red-bg);border-left:3px solid var(--red);}
-.risk-signal{font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px;}
+.risk-signal{font-size:14px;font-weight:500;color:var(--text);margin-bottom:4px;}
 .risk-why{font-size:12px;color:var(--text-2);line-height:1.5;}
 
 /* QUESTIONS */
 .questions{display:flex;flex-direction:column;gap:10px;}
 .question-item{padding:12px 14px;border-radius:var(--radius-sm);background:var(--blue-bg);border-left:3px solid var(--blue);}
 .question-num{font-family:var(--font-heading);font-size:10px;font-weight:700;color:var(--blue-text);letter-spacing:.5px;margin-bottom:4px;}
-.question-text{font-size:13.5px;font-weight:500;color:var(--text);margin-bottom:4px;line-height:1.5;}
+.question-text{font-size:14.5px;font-weight:500;color:var(--text);margin-bottom:5px;line-height:1.55;}
 .question-why{font-size:12px;color:var(--text-2);line-height:1.5;font-style:italic;}
 
 /* ONBOARDING OVERLAY */
@@ -219,6 +221,54 @@ textarea::placeholder{color:var(--text-3);font-style:italic;font-family:var(--fo
 }
 
 /* PRINT — A4 clean brief */
+/* ANIMATIONS */
+@keyframes fadeSlideUp {
+  from { opacity:0; transform:translateY(12px); }
+  to { opacity:1; transform:translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity:0; }
+  to { opacity:1; }
+}
+.animate-in { animation: fadeSlideUp .35s cubic-bezier(.4,0,.2,1) both; }
+.animate-in:nth-child(1){animation-delay:.05s}
+.animate-in:nth-child(2){animation-delay:.1s}
+.animate-in:nth-child(3){animation-delay:.15s}
+.animate-in:nth-child(4){animation-delay:.2s}
+.animate-in:nth-child(5){animation-delay:.25s}
+.animate-in:nth-child(6){animation-delay:.3s}
+
+/* PREP SCORE */
+.prep-score-bar{margin-top:8px;padding:10px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface-2);display:flex;flex-direction:column;gap:6px;}
+.prep-score-top{display:flex;align-items:center;justify-content:space-between;}
+.prep-score-label{font-size:11px;font-weight:600;color:var(--text-3);font-family:var(--font-heading);letter-spacing:.5px;text-transform:uppercase;}
+.prep-score-val{font-family:var(--font-heading);font-size:12px;font-weight:700;}
+.prep-track{height:4px;background:var(--border);border-radius:2px;overflow:hidden;}
+.prep-fill{height:100%;border-radius:2px;transition:width .4s,background .4s;}
+.prep-hint{font-size:11px;color:var(--text-3);line-height:1.5;}
+.prep-hint.warn{color:var(--amber-text);}
+.prep-hint.good{color:var(--green-text);}
+
+/* SENTIMENT CARD */
+.sentiment-card{border-radius:var(--radius);padding:14px 20px;border:1px solid;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow);}
+.sentiment-card.positive{background:var(--green-bg);border-color:var(--green-border);}
+.sentiment-card.neutral{background:var(--surface);border-color:var(--border);}
+.sentiment-card.concerned{background:var(--amber-bg);border-color:var(--amber-border);}
+.sentiment-card.at-risk{background:var(--red-bg);border-color:var(--red-border);}
+.sentiment-icon{font-size:28px;flex-shrink:0;}
+.sentiment-info{flex:1;}
+.sentiment-label{font-family:var(--font-heading);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:3px;}
+.sentiment-card.positive .sentiment-label{color:var(--green-text);}
+.sentiment-card.neutral .sentiment-label{color:var(--text-3);}
+.sentiment-card.concerned .sentiment-label{color:var(--amber-text);}
+.sentiment-card.at-risk .sentiment-label{color:var(--red-text);}
+.sentiment-read{font-size:13px;color:var(--text-2);line-height:1.5;margin-bottom:6px;}
+.sentiment-opener{font-size:13px;font-style:italic;color:var(--text);font-weight:500;padding:8px 12px;border-radius:var(--radius-sm);margin-top:6px;}
+.sentiment-card.positive .sentiment-opener{background:rgba(16,185,129,.08);}
+.sentiment-card.neutral .sentiment-opener{background:var(--surface-2);}
+.sentiment-card.concerned .sentiment-opener{background:rgba(245,158,11,.08);}
+.sentiment-card.at-risk .sentiment-opener{background:rgba(239,68,68,.08);}
+
 /* WATCHLIST */
 .watchlist{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 32px;}
 .watchlist-inner{max-width:1400px;margin:0 auto;}
@@ -229,8 +279,8 @@ textarea::placeholder{color:var(--text-3);font-style:italic;font-family:var(--fo
 .watchlist-empty{font-size:12px;color:var(--text-3);font-style:italic;padding:4px 0;}
 .watchlist-loading{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-3);}
 .watchlist-cards{display:flex;gap:10px;flex-wrap:wrap;}
-.wl-card{flex:1;min-width:200px;max-width:320px;padding:12px 14px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface-2);cursor:pointer;transition:all .15s;position:relative;}
-.wl-card:hover{border-color:var(--accent-border);background:var(--surface-3);}
+.wl-card{flex:1;min-width:200px;max-width:320px;padding:12px 14px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface-2);cursor:pointer;transition:all .2s cubic-bezier(.4,0,.2,1);position:relative;}
+.wl-card:hover{border-color:var(--accent-border);background:var(--surface-3);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.3);}
 .wl-card.priority-high{border-left:3px solid var(--red);}
 .wl-card.priority-medium{border-left:3px solid var(--amber);}
 .wl-card.priority-low{border-left:3px solid var(--green);}
@@ -286,7 +336,7 @@ textarea::placeholder{color:var(--text-3);font-style:italic;font-family:var(--fo
       <div class="ob-title">Stop spending hours preparing for client calls.</div>
       <div class="ob-sub">Paste your raw notes — emails, call logs, tickets — and get a structured brief in 30 seconds.</div>
       <div class="ob-highlight">
-        <div class="ob-highlight-text">"CSMs spend 8+ hours reconstructing account history before a QBR. Call Prep does it in 30 seconds."</div>
+        <div class="ob-highlight-text">"The more context you give, the smarter the brief. Paste emails, call notes, tickets — all at once, in any order. The AI does the rest."</div>
       </div>
       <button class="ob-btn" onclick="obNext(1)">Show me how it works →</button>
       <span class="ob-skip" onclick="obSkip()">Skip intro</span>
@@ -297,7 +347,7 @@ textarea::placeholder{color:var(--text-3);font-style:italic;font-family:var(--fo
       <div class="ob-steps">
         <div class="ob-step-item">
           <div class="ob-step-num">1</div>
-          <div class="ob-step-text"><strong>Paste everything you have</strong> — call notes, emails, tickets, Slack messages. No formatting needed.</div>
+          <div class="ob-step-text"><strong>Paste everything you have</strong> — emails, call notes, tickets, Slack, CRM exports. No formatting needed. The messier, the better.</div>
         </div>
         <div class="ob-step-item">
           <div class="ob-step-num">2</div>
@@ -334,30 +384,31 @@ textarea::placeholder{color:var(--text-3);font-style:italic;font-family:var(--fo
 <!-- PRINT HEADER — hidden on screen, visible on print -->
 <div class="print-header" style="display:none;" id="print-header">
   <div class="print-header-top">
-    <div class="print-logo">Call Prep <span>AI Pre-Call Brief · call-prep-uokh.vercel.app</span></div>
+    <div class="print-logo">Debrief <span>AI Pre-Call Brief · call-prep-uokh.vercel.app</span></div>
     <div class="print-date" id="print-date"></div>
   </div>
 </div>
 
 <div class="header">
   <div class="header-inner">
-    <div style="display:flex;align-items:center;gap:10px;">
-      <svg width="26" height="26" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;border-radius:7px;">
+    <a href="/landing.html" style="display:flex;align-items:center;gap:12px;text-decoration:none;transition:opacity .15s;" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
+      <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;border-radius:8px;">
         <defs><linearGradient id="dg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6366f1"/><stop offset="1" stop-color="#3b82f6"/></linearGradient></defs>
         <rect width="32" height="32" rx="8" fill="url(#dg)"/>
         <text x="7" y="24" font-family="Georgia,serif" font-size="22" font-weight="700" fill="white">D</text>
       </svg>
       <div>
-        <div style="display:flex;align-items:baseline;gap:10px;">
+        <div style="display:flex;align-items:center;gap:12px;">
           <div class="header-title">Debrief</div>
-          <div class="header-sub" style="margin:0;">AI pre-call brief · Built for CSMs</div>
+          <div style="width:1px;height:16px;background:var(--border-2);"></div>
+          <div class="header-sub" style="margin:0;font-size:12px;">AI pre-call brief for CSMs</div>
         </div>
-        <div class="header-badge" style="margin-top:5px;">
+        <div style="display:flex;align-items:center;gap:5px;margin-top:3px;">
           <span class="badge-dot"></span>
-          Paste notes · Get your brief in 30 seconds
+          <span style="font-size:11px;color:var(--text-3);font-family:var(--font-heading);">Paste notes · Get your brief in 30 seconds</span>
         </div>
       </div>
-    </div>
+    </a>
   </div>
 </div>
 
@@ -400,6 +451,14 @@ textarea::placeholder{color:var(--text-3);font-style:italic;font-family:var(--fo
       </div>
     </div>
 
+    <!-- CONTEXT FIELD -->
+    <div class="form-group">
+      <label style="display:flex;align-items:center;gap:6px;">
+        Context <span style="font-size:10px;color:var(--text-3);font-weight:400;">(optional — helps the AI)</span>
+      </label>
+      <input type="text" id="f-context" placeholder="e.g. renewal in 30 days, new CFO, post-acquisition, high season..." style="font-size:12px;" />
+    </div>
+
     <div id="paste-tip" style="display:none;background:var(--surface-2);border:1px solid var(--accent-border);border-radius:var(--radius-sm);padding:10px 14px;font-size:12px;color:var(--text-2);line-height:1.7;">
       <strong style="color:var(--text);font-size:12px;">Paste any of these:</strong><br>
       · Raw call notes from your CRM or Notion<br>
@@ -416,7 +475,7 @@ textarea::placeholder{color:var(--text-3);font-style:italic;font-family:var(--fo
     </div>
 
     <!-- NOTES — main focus, takes max space -->
-    <div style="display:flex;flex-direction:column;flex:1;min-height:0;">
+    <div style="display:flex;flex-direction:column;flex:1;min-height:180px;overflow:hidden;">
       <div class="notes-label-row">
         <div style="display:flex;align-items:center;gap:8px;">
           <div class="section-label" style="margin-bottom:0;">Your notes</div>
@@ -430,22 +489,31 @@ textarea::placeholder{color:var(--text-3);font-style:italic;font-family:var(--fo
       </div>
       <textarea
         id="f-notes"
-        style="flex:1;min-height:300px;height:100%;"
-        placeholder="Paste everything — call notes, emails, tickets, Slack threads. No formatting needed.
+        style="flex:1;min-height:120px;height:100%;"
+        placeholder="Dump everything here — the more you paste, the better the brief.
 
-Good examples of what to paste:
-· "Apr 3 — call with Marc, usage at 23%, SSO still broken"
-· Forwarded email thread with the client
-· Support ticket descriptions
-· Your own messy notes from a call
-· CRM activity log copy-pasted
+✓ Email threads with the client (copy the whole thing)
+✓ Your call notes, however messy
+✓ Support tickets — paste the description
+✓ Slack messages about the account
+✓ CRM activity log, copy-pasted
+✓ Meeting summaries, even bullet points
 
-Dates help the AI build the timeline, but even rough notes work."
+Don't clean it up. Don't reformat it. Just paste.
+The AI handles the mess — that's the point."
         oninput="onNotesChange()"
       ></textarea>
       <div style="font-size:11px;color:var(--text-3);margin-top:6px;display:flex;align-items:center;gap:5px;">
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        Your notes never leave your browser. No data is stored on our servers.
+        Your notes never leave your browser — paste freely, nothing is stored on our servers.
+      </div>
+      <div class="prep-score-bar" id="prep-score-bar" style="display:none;">
+        <div class="prep-score-top">
+          <span class="prep-score-label">Brief quality</span>
+          <span class="prep-score-val" id="prep-score-val">—</span>
+        </div>
+        <div class="prep-track"><div class="prep-fill" id="prep-fill" style="width:0%;background:var(--amber);"></div></div>
+        <div class="prep-hint" id="prep-hint"></div>
       </div>
     </div>
 
@@ -455,7 +523,7 @@ Dates help the AI build the timeline, but even rough notes work."
     </button>
 
     <!-- SAVE -->
-    <button class="save-btn" onclick="saveCurrentAccount()" style="width:100%;padding:9px;font-size:13px;">💾 Save account notes</button>
+    <button class="save-btn" onclick="saveCurrentAccount()" style="width:100%;padding:8px;font-size:12px;opacity:.8;">💾 Save account notes</button>
 
     <div class="divider"></div>
 
@@ -470,6 +538,8 @@ Dates help the AI build the timeline, but even rough notes work."
       </div>
       <button class="new-account-btn" style="margin-top:8px;" onclick="newAccount()">+ New account</button>
     </div>
+
+    <div id="session-list-wrap" style="display:none;"></div>
 
     <div class="divider"></div>
 
@@ -489,14 +559,32 @@ Dates help the AI build the timeline, but even rough notes work."
   <div class="panel-right">
 
     <div class="empty-state" id="empty-state">
-      <div class="empty-icon">📋</div>
-      <div class="empty-title">Your brief will appear here</div>
-      <div class="empty-sub">Paste your account notes and click Generate — or save an account to build its history over time.</div>
-      <div class="empty-steps">
-        <div class="empty-step"><div class="empty-step-num">1</div><div>Paste notes — calls, emails, tickets, anything</div></div>
-        <div class="empty-step"><div class="empty-step-num">2</div><div>Save the account to keep its history</div></div>
-        <div class="empty-step"><div class="empty-step-num">3</div><div>Next quarter, add new notes — the AI sees the full picture</div></div>
+      <div style="font-size:32px;margin-bottom:8px;">👋</div>
+      <div class="empty-title" style="font-size:20px;">Welcome to Debrief</div>
+      <div class="empty-sub" style="margin-bottom:28px;">Your AI pre-call brief — 3 steps, less than 1 minute.</div>
+
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:100%;max-width:580px;margin-bottom:28px;">
+        <div style="background:var(--green-bg);border:1px solid var(--green-border);border-radius:var(--radius);padding:20px 16px;text-align:center;">
+          <div style="font-size:24px;margin-bottom:10px;">🔴</div>
+          <div style="font-family:var(--font-heading);font-size:13px;font-weight:600;color:var(--green-text);margin-bottom:6px;">1. Demo loaded</div>
+          <div style="font-size:12px;color:var(--text-2);line-height:1.5;">Nova Corp is pre-loaded on the left — an at-risk account</div>
+        </div>
+        <div style="background:var(--accent-light);border:1px solid var(--accent-border);border-radius:var(--radius);padding:20px 16px;text-align:center;">
+          <div style="font-size:24px;margin-bottom:10px;">✦</div>
+          <div style="font-family:var(--font-heading);font-size:13px;font-weight:600;color:var(--accent);margin-bottom:6px;">2. Click Generate</div>
+          <div style="font-size:12px;color:var(--text-2);line-height:1.5;">See what Debrief extracts in 30 seconds</div>
+        </div>
+        <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);padding:20px 16px;text-align:center;">
+          <div style="font-size:24px;margin-bottom:10px;">📋</div>
+          <div style="font-family:var(--font-heading);font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:6px;">3. Use your notes</div>
+          <div style="font-size:12px;color:var(--text-2);line-height:1.5;">Clear the demo and paste your own account notes</div>
+        </div>
       </div>
+
+      <button onclick="loadDemo('atrisk'); document.getElementById('gen-btn').classList.add('pulse-cta');" style="font-family:var(--font-heading);font-size:14px;font-weight:600;padding:12px 28px;border-radius:var(--radius);border:none;background:linear-gradient(135deg,var(--accent-hover),var(--accent));color:white;cursor:pointer;box-shadow:0 4px 20px rgba(99,102,241,.35);transition:all .2s;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='none'">
+        Load demo &amp; try it →
+      </button>
+      <div style="font-size:12px;color:var(--text-3);margin-top:12px;">or paste your own notes on the left</div>
     </div>
 
     <div class="output" id="output">
@@ -507,10 +595,15 @@ Dates help the AI build the timeline, but even rough notes work."
             <div class="brief-account" id="out-account">—</div>
             <div class="brief-meta" id="out-meta">—</div>
           </div>
+          <div style="display:flex;gap:8px;flex-shrink:0;">
+          <button class="print-btn" onclick="exportNotes()" style="border-color:var(--accent-border);color:var(--accent);">📋 Export notes</button>
           <button class="print-btn" onclick="window.print()">🖨 Print / PDF</button>
+        </div>
         </div>
         <div class="brief-read" id="out-read"></div>
       </div>
+
+      <div id="sentiment-card-wrap"></div>
 
       <div id="history-strip-wrap"></div>
 
@@ -571,7 +664,7 @@ Dates help the AI build the timeline, but even rough notes work."
       </div>
 
     <!-- FEEDBACK -->
-    <div id="feedback-bar" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+    <div id="feedback-bar" style="background:var(--surface);border:none;border-radius:var(--radius);padding:18px 22px;box-shadow:0 2px 12px rgba(0,0,0,.25),0 1px 3px rgba(0,0,0,.15);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
       <div style="font-size:13px;color:var(--text-2);">Was this brief useful?</div>
       <div style="display:flex;gap:8px;" id="feedback-btns">
         <button onclick="submitFeedback('yes')" style="font-family:var(--font-heading);font-size:13px;font-weight:500;padding:7px 18px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface-2);color:var(--text-2);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px;" onmouseover="this.style.borderColor='var(--green)';this.style.color='var(--green-text)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-2)'">
@@ -627,7 +720,9 @@ Example:
     <span style="font-size:12px;color:var(--text-3);">Built by</span>
     <a href="https://www.linkedin.com/in/thomas-hotton" target="_blank" style="font-size:12px;font-weight:500;color:var(--accent);text-decoration:none;transition:opacity .15s;" onmouseover="this.style.opacity='.7'" onmouseout="this.style.opacity='1'">Tom Hotton</a>
     <span style="color:var(--border-2);">·</span>
-    <span style="font-size:12px;color:var(--text-3);">Customer Success Manager · UTC+6</span>
+    <span style="font-size:12px;color:var(--text-3);">Customer Success Manager</span>
+    <span style="color:var(--border-2);">·</span>
+    <a href="/landing.html" style="font-size:12px;color:var(--text-3);text-decoration:none;transition:color .15s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-3)'">About Debrief →</a>
   </div>
   <button id="share-btn" onclick="shareToolLinkedIn()" style="font-family:var(--font-heading);font-size:12px;font-weight:500;padding:7px 16px;border-radius:var(--radius-sm);border:1px solid var(--accent-border);background:var(--accent-light);color:var(--accent);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px;" onmouseover="this.style.background='rgba(99,102,241,.25)'" onmouseout="this.style.background='var(--accent-light)'">
     <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
@@ -636,170 +731,21 @@ Example:
 </div>
 
 <script>
-async function draftFollowUp() {
-  var btn = event.target.closest('button');
-  var origText = btn.innerHTML;
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner" style="border-color:rgba(99,102,241,.3);border-top-color:var(--accent);width:13px;height:13px;border-width:2px;display:inline-block;border-radius:50%;animation:spin .7s linear infinite;vertical-align:-2px;margin-right:6px;"></span> Drafting...';
-
-  var account = document.getElementById('out-account').textContent;
-  var commitments = document.getElementById('out-commitments').innerText || '';
-  var risks = document.getElementById('out-risks').innerText || '';
-  var nextSteps = document.getElementById('out-next') ? document.getElementById('out-next').innerText : '';
-  var callType = document.getElementById('f-calltype').value;
-
-  try {
-    var resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer GROQ_API_KEY' },
-      body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
-        max_tokens: 2000,
-        temperature: 0.1,
-        messages: [{ role: 'user', content: buildCallPrepPrompt(notes, account, callType) }]
-      })
-    });
-    var groqJson = await resp.json();
-    var rawText = groqJson.choices && groqJson.choices[0] ? groqJson.choices[0].message.content : '';
-    var clean = rawText.replace(/```json|```/g, '').trim();
-    var data;
-    try { data = JSON.parse(clean); }
-    catch(e) {
-      var op = (clean.match(/\{/g)||[]).length, cl = (clean.match(/\}/g)||[]).length;
-      var rec = clean.replace(/,\s*\]/g,']').replace(/,\s*\}/g,'}');
-      for(var i=0;i<op-cl;i++) rec+='}';
-      data = JSON.parse(rec);
-    }
-    if (data.error) throw new Error(data.error);
-    var text = 'DECISIONS MADE:\n' + (data.decisions||[]).join('\n') + '\n\nCOMMITMENTS TAKEN:\n' + (data.commitments||[]).join('\n') + '\n\nNEXT STEPS:\n' + (data.next_steps||[]).join('\n') + '\n\nKEY QUOTE:\n' + (data.key_quote||'');
-    showExtra('Call summary — ' + account, text);
-
-    var saveNote = confirm('Save this summary to ' + account + ' account history?');
-    if (saveNote) {
-      var accounts = getAccounts();
-      var key = account.toLowerCase();
-      if (accounts[key]) {
-        var today = new Date().toLocaleDateString('en-GB', {day:'numeric', month:'short', year:'numeric'});
-        accounts[key].sessions.push({ notes: transcript, date: today });
-        accounts[key].updatedAt = new Date().toISOString();
-        saveAccounts(accounts);
-        renderAccountList();
-        buildWatchlist();
-        document.getElementById('saved-indicator').classList.add('visible');
-        setTimeout(function(){ document.getElementById('saved-indicator').classList.remove('visible'); }, 2500);
-      }
-    }
-  } catch(e) {
-    showExtra('Error', e.message);
-  }
-
-  btn.disabled = false;
-  btn.innerHTML = origText;
-}
-
-function openTranscriptModal() {
-  document.getElementById('transcript-modal').style.display = 'flex';
-  document.getElementById('transcript-input').value = '';
-  document.getElementById('transcript-input').focus();
-}
-
-function closeTranscriptModal() {
-  document.getElementById('transcript-modal').style.display = 'none';
-}
-
-async function submitTranscript() {
-  var text = document.getElementById('transcript-input').value.trim();
-  if (!text) return;
-  closeTranscriptModal();
-  await runSummarizeCall(text);
-}
-
-function showExtra(title, content) {
-  document.getElementById('extra-title').textContent = title;
-  document.getElementById('extra-content').textContent = content;
-  document.getElementById('extra-output').style.display = 'block';
-  document.getElementById('extra-output').scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-function submitFeedback(type) {
-  const bar = document.getElementById('feedback-bar');
-  const account = document.getElementById('out-account').textContent || 'unknown';
-
-  // Store locally
-  const key = 'debrief_feedback';
-  const existing = JSON.parse(localStorage.getItem(key) || '[]');
-  existing.push({ type, account, date: new Date().toISOString() });
-  localStorage.setItem(key, JSON.stringify(existing));
-
-  // Visual confirmation
-  const positive = type === 'yes';
-  bar.innerHTML = `
-    <div style="display:flex;align-items:center;gap:10px;width:100%;">
-      <span style="font-size:18px;">${positive ? '🙏' : '📝'}</span>
-      <div>
-        <div style="font-size:13px;font-weight:500;color:var(--text);">${positive ? 'Thanks — glad it helped!' : 'Thanks for the feedback.'}</div>
-        <div style="font-size:12px;color:var(--text-3);margin-top:2px;">${positive ? 'Share Debrief with your team if it saves you time.' : 'Thanks for letting me know. Reach out on LinkedIn anytime.'}</div>
-      </div>
-    </div>`;
-  bar.style.borderColor = positive ? 'var(--green-border)' : 'var(--border)';
-  bar.style.background = positive ? 'var(--green-bg)' : 'var(--surface)';
-}
-
-function shareToolLinkedIn() {
-  const text = `I built an AI tool for CSMs that solves a real problem: stop spending hours reconstructing account history before a QBR.
-
-Paste your raw notes — emails, call logs, tickets — and get a structured pre-call brief in 30 seconds:
-✅ Chronological timeline
-⚠️ Open commitments you forgot about
-🔴 Risk signals hidden in your notes
-💬 Questions tailored to that specific account
-
-Try it here → https://call-prep-uokh.vercel.app
-
-Built from scratch as part of my AI portfolio. #CustomerSuccess #CSM #AI #Productivity`;
-
-  const url = 'https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent('https://call-prep-uokh.vercel.app');
-  
-  navigator.clipboard.writeText(text).then(() => {
-    const btn = document.getElementById('share-btn');
-    btn.innerHTML = '✓ Caption copied — opening LinkedIn';
-    btn.style.background = 'var(--green-bg)';
-    btn.style.borderColor = 'var(--green-border)';
-    btn.style.color = 'var(--green-text)';
-    setTimeout(() => {
-      window.open(url, '_blank');
-      setTimeout(() => {
-        btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg> Share this tool';
-        btn.style.background = 'var(--accent-light)';
-        btn.style.borderColor = 'var(--accent-border)';
-        btn.style.color = 'var(--accent)';
-      }, 3000);
-    }, 800);
-  }).catch(() => {
-    window.open(url, '_blank');
-  });
-}
-</script>
-
-<script>
-
-// ── GROQ DIRECT CALL ──
-var GROQ_KEY = "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";
+var GROQ_KEY = "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";
 
 async function groqCall(prompt, maxTokens) {
-  var resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+  var r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + GROQ_KEY },
-    body: JSON.stringify({ model: 'llama-3.3-70b-versatile', max_tokens: maxTokens || 2000, temperature: 0.1, messages: [{ role: 'user', content: prompt }] })
+    headers: {'Content-Type':'application/json','Authorization':'Bearer '+GROQ_KEY},
+    body: JSON.stringify({model:'llama-3.3-70b-versatile',max_tokens:maxTokens||2000,temperature:0.1,messages:[{role:'user',content:prompt}]})
   });
-  var json = await resp.json();
-  var text = json.choices && json.choices[0] ? json.choices[0].message.content : '';
-  var clean = text.replace(/```json|```/g, '').trim();
-  try { return JSON.parse(clean); }
-  catch(e) {
-    var op = (clean.match(/\{/g)||[]).length, cl = (clean.match(/\}/g)||[]).length;
-    var rec = clean.replace(/,\s*\]/g,']').replace(/,\s*\}/g,'}');
-    for(var i=0;i<op-cl;i++) rec+='}';
+  var j = await r.json();
+  var t = j.choices&&j.choices[0]?j.choices[0].message.content:'';
+  var c = t.replace(/```json|```/g,'').trim();
+  try{return JSON.parse(c);}catch(e){
+    var op=(c.match(/\{/g)||[]).length,cl=(c.match(/\}/g)||[]).length;
+    var rec=c.replace(/,\s*\]/g,']').replace(/,\s*\}/g,'}');
+    for(var i=0;i<op-cl;i++)rec+='}';
     return JSON.parse(rec);
   }
 }
@@ -862,14 +808,78 @@ function loadAccount(key) {
 
   document.getElementById('f-notes').value = allNotes;
   document.getElementById('char-count').textContent = allNotes.length + ' chars';
+  if (acc.lastContext) document.getElementById('f-context').value = acc.lastContext;
 
   if (acc.sessions && acc.sessions.length > 0) {
     document.getElementById('update-banner').classList.add('visible');
   }
 
+  renderSessionList(key);
   renderAccountList();
   document.getElementById('output').classList.remove('visible');
   document.getElementById('empty-state').style.display = '';
+}
+
+// ── SESSION LIST ──
+function renderSessionList(accountKey) {
+  var wrap = document.getElementById('session-list-wrap');
+  if (!wrap) return;
+  var accounts = getAccounts();
+  var acc = accounts[accountKey];
+  if (!acc || !acc.sessions || acc.sessions.length === 0) {
+    wrap.innerHTML = '';
+    wrap.style.display = 'none';
+    return;
+  }
+  wrap.style.display = 'block';
+  wrap.innerHTML = '';
+  var label = document.createElement('div');
+  label.className = 'section-label';
+  label.style.marginBottom = '6px';
+  label.textContent = 'Sessions (' + acc.sessions.length + ')';
+  wrap.appendChild(label);
+  acc.sessions.forEach(function(s, i) {
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--radius-sm);background:var(--surface-2);border:1px solid var(--border);margin-bottom:4px;';
+    var info = document.createElement('div');
+    info.style.cssText = 'flex:1;min-width:0;';
+    var dateDiv = document.createElement('div');
+    dateDiv.style.cssText = 'font-size:12px;font-weight:500;color:var(--text);';
+    dateDiv.textContent = s.date || ('Session ' + (i+1));
+    var previewDiv = document.createElement('div');
+    previewDiv.style.cssText = 'font-size:11px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
+    previewDiv.textContent = s.notes.substring(0, 45).trim() + '...';
+    info.appendChild(dateDiv);
+    info.appendChild(previewDiv);
+    var btn = document.createElement('button');
+    btn.textContent = '×';
+    btn.style.cssText = 'flex-shrink:0;width:20px;height:20px;border-radius:3px;border:none;background:transparent;color:var(--text-3);cursor:pointer;font-size:13px;';
+    btn.addEventListener('mouseenter', function(){ this.style.color = 'var(--red-text)'; this.style.background = 'var(--red-bg)'; });
+    btn.addEventListener('mouseleave', function(){ this.style.color = 'var(--text-3)'; this.style.background = 'transparent'; });
+    (function(idx){ btn.addEventListener('click', function(e){ e.stopPropagation(); deleteSession(accountKey, idx); }); })(i);
+    row.appendChild(info);
+    row.appendChild(btn);
+    wrap.appendChild(row);
+  });
+}
+function deleteSession(accountKey, sessionIndex) {
+  var accounts = getAccounts();
+  var acc = accounts[accountKey];
+  if (!acc) return;
+  acc.sessions.splice(sessionIndex, 1);
+  acc.updatedAt = new Date().toISOString();
+  saveAccounts(accounts);
+  // Reload notes without deleted session
+  var allNotes = acc.sessions.map(function(s, i) {
+    var label = s.date ? ('\n--- Session '+(i+1)+' ('+s.date+') ---\n') : ('\n--- Session '+(i+1)+' ---\n');
+    return label + s.notes;
+  }).join('\n');
+  document.getElementById('f-notes').value = allNotes;
+  document.getElementById('char-count').textContent = allNotes.length + ' chars';
+  if (acc.lastContext) document.getElementById('f-context').value = acc.lastContext;
+  renderSessionList(accountKey);
+  renderAccountList();
+  buildWatchlist();
 }
 
 // ── RESET NOTES ──
@@ -889,6 +899,7 @@ function resetNotes() {
 function newAccount() {
   document.getElementById('f-account').value = '';
   document.getElementById('f-notes').value = '';
+  document.getElementById('f-context').value = '';
   document.getElementById('char-count').textContent = '0 chars';
   document.getElementById('update-banner').classList.remove('visible');
   document.getElementById('saved-indicator').classList.remove('visible');
@@ -923,8 +934,10 @@ function saveCurrentAccount() {
     return;
   }
 
-  accounts[key].sessions.push({ notes, date: today });
+  const context = document.getElementById('f-context').value.trim();
+  accounts[key].sessions.push({ notes, date: today, context: context });
   accounts[key].callType = callType;
+  accounts[key].lastContext = context;
   accounts[key].updatedAt = new Date().toISOString();
   saveAccounts(accounts);
 
@@ -950,7 +963,84 @@ function deleteAccount(e, key) {
 
 function onAccountNameChange() { renderAccountList(); }
 function onNotesChange() {
-  document.getElementById('char-count').textContent = document.getElementById('f-notes').value.length + ' chars';
+  var notes = document.getElementById('f-notes').value;
+  var len = notes.length;
+  var el = document.getElementById('char-count');
+  if (len === 0) {
+    el.textContent = '0 chars';
+    el.style.color = 'var(--text-3)';
+    document.getElementById('prep-score-bar').style.display = 'none';
+    return;
+  } else if (len < 300) {
+    el.textContent = len + ' chars — add more for a richer brief';
+    el.style.color = 'var(--amber-text)';
+  } else if (len < 800) {
+    el.textContent = len + ' chars — good';
+    el.style.color = 'var(--green-text)';
+  } else {
+    el.textContent = len + ' chars — great';
+    el.style.color = 'var(--green-text)';
+  }
+  updatePrepScore(notes);
+}
+
+function updatePrepScore(notes) {
+  var bar = document.getElementById('prep-score-bar');
+  var fill = document.getElementById('prep-fill');
+  var val = document.getElementById('prep-score-val');
+  var hint = document.getElementById('prep-hint');
+  bar.style.display = 'block';
+
+  var score = 0;
+  var missing = [];
+
+  var lower = notes.toLowerCase();
+
+  // Check for dates (strong signal of structured notes)
+  var hasDates = /(\d{1,2}\s+(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)|jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec\s+\d{1,2}|\d{1,2}\/\d{1,2}|\d{4}-\d{2}-\d{2})/i.test(notes);
+  if (hasDates) score += 25; else missing.push('dates or timeline');
+
+  // Check for call/meeting signals
+  var hasCall = /(call|meeting|spoke|talked|discussed|zoom|teams)/i.test(notes);
+  if (hasCall) score += 20; else missing.push('call or meeting notes');
+
+  // Check for email signals
+  var hasEmail = /(email|wrote|replied|sent|message|emailed)/i.test(notes);
+  if (hasEmail) score += 15; else missing.push('email thread');
+
+  // Check for issue/ticket signals
+  var hasIssue = /(ticket|issue|bug|problem|error|support|case|escalat)/i.test(notes);
+  if (hasIssue) score += 15; else missing.push('support tickets or issues');
+
+  // Check for people/contacts
+  var hasPeople = /([A-Z][a-z]+ [A-Z][a-z]+|VP|CEO|CTO|Head of|Manager|Director)/i.test(notes);
+  if (hasPeople) score += 15;
+
+  // Bonus for length
+  if (notes.length > 500) score += 5;
+  if (notes.length > 1000) score += 5;
+
+  score = Math.min(score, 100);
+
+  // Color
+  var color = score < 40 ? 'var(--red)' : score < 65 ? 'var(--amber)' : 'var(--green)';
+  var label = score < 40 ? 'Weak' : score < 65 ? 'Decent' : score < 85 ? 'Good' : 'Strong';
+
+  fill.style.width = score + '%';
+  fill.style.background = color;
+  val.textContent = label + ' · ' + score + '/100';
+  val.style.color = color;
+
+  if (missing.length > 0 && score < 85) {
+    hint.className = 'prep-hint warn';
+    hint.textContent = 'Missing: ' + missing.slice(0,2).join(', ') + '. Add these for a richer brief.';
+  } else if (score >= 85) {
+    hint.className = 'prep-hint good';
+    hint.textContent = 'Great input — your brief will be detailed and accurate.';
+  } else {
+    hint.className = 'prep-hint good';
+    hint.textContent = 'Solid input. Add more context for an even richer brief.';
+  }
 }
 
 // ── DEMOS ──
@@ -1021,8 +1111,10 @@ async function generate() {
   btn.innerHTML = '<span class="spinner"></span> Analyzing...';
 
   try {
-    var callPrepPrompt = 'You are a senior Customer Success Manager. Analyze the notes and return ONLY valid JSON, no markdown, no backticks.\n\nACCOUNT: ' + account + '\nCALL TYPE: ' + callType + '\n\nNOTES:\n' + notes.slice(0, 8000) + '\n\nReturn this exact JSON:\n{"account_name":"string","call_type":"string","account_read":"2-3 sentences honest CSM reading","timeline":[{"date":"string","type":"call|email|ticket|commitment|win|risk","title":"max 6 words","detail":"one sentence","flag":"open_commitment|risk|win|neutral"}],"open_commitments":[{"what":"string","promised_on":"string","promised_by":"CSM|client|unknown","status":"overdue|pending|unclear","urgency":"high|medium|low"}],"risk_signals":[{"signal":"string","why_it_matters":"one sentence"}],"questions_to_ask":[{"question":"specific question for this account","why":"one sentence"}],"dont_forget":"single most important thing for this call"}';
-    const data = await groqCall(callPrepPrompt, 2000);
+    var context = document.getElementById('f-context').value.trim();
+    var contextStr = context ? ' ADDITIONAL CONTEXT: '+context : '';
+    var p1 = 'You are a senior CSM. Analyze notes and return ONLY valid JSON no markdown. ACCOUNT: '+account+' CALL TYPE: '+callType+contextStr+' NOTES: '+notes.slice(0,8000)+' Return: {"account_name":"","call_type":"","account_read":"2-3 sentence CSM reading of this account","sentiment":"positive|neutral|concerned|at-risk","sentiment_reason":"one sentence explaining the detected sentiment based on specific signals in the notes","opening_line":"the perfect first sentence to say when the call starts — tailored to the sentiment and account context. If at-risk: empathetic and direct. If positive: warm and forward-looking. If expansion: ambitious. Max 25 words.","timeline":[{"date":"","type":"call|email|ticket|commitment|win|risk","title":"max 6 words","detail":"one sentence","flag":"open_commitment|risk|win|neutral"}],"open_commitments":[{"what":"","promised_on":"","promised_by":"CSM|client|unknown","status":"overdue|pending|unclear","urgency":"high|medium|low"}],"risk_signals":[{"signal":"","why_it_matters":"one sentence"}],"questions_to_ask":[{"question":"","why":""}],"dont_forget":"most important thing for this call"}';
+    const data = await groqCall(p1, 2000);
     if (data.error) throw new Error(data.error);
 
     // Header
@@ -1030,6 +1122,27 @@ async function generate() {
     document.getElementById('out-meta').textContent = `${data.call_type || callType} · Pre-call brief · ${new Date().toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'})}`;
     document.getElementById('out-read').textContent = data.account_read || '';
     document.getElementById('out-df-text').textContent = data.dont_forget || '';
+
+    // Sentiment card
+    var sentWrap = document.getElementById('sentiment-card-wrap');
+    if (data.sentiment) {
+      var sentIcons = {positive:'😊', neutral:'😐', concerned:'😟', 'at-risk':'🚨'};
+      var sentLabels = {positive:'Positive sentiment', neutral:'Neutral sentiment', concerned:'Concerned', 'at-risk':'At risk'};
+      var icon = sentIcons[data.sentiment] || '😐';
+      var label = sentLabels[data.sentiment] || data.sentiment;
+      sentWrap.innerHTML = '';
+      var card = document.createElement('div');
+      card.className = 'sentiment-card ' + data.sentiment;
+      card.innerHTML = '<div class="sentiment-icon">' + icon + '</div>' +
+        '<div class="sentiment-info">' +
+          '<div class="sentiment-label">' + label + '</div>' +
+          '<div class="sentiment-read">' + (data.sentiment_reason||'') + '</div>' +
+          (data.opening_line ? '<div class="sentiment-opener">💬 &ldquo;' + data.opening_line + '&rdquo;</div>' : '') +
+        '</div>';
+      sentWrap.appendChild(card);
+    } else {
+      sentWrap.innerHTML = '';
+    }
 
     // History strip — show sessions if account is saved
     const accounts = getAccounts();
@@ -1110,6 +1223,13 @@ async function generate() {
 
     document.getElementById('empty-state').style.display = 'none';
     document.getElementById('output').classList.add('visible');
+    // Animate each card in sequence
+    document.querySelectorAll('#output > div').forEach(function(el, i) {
+      el.classList.remove('animate-in');
+      void el.offsetWidth; // force reflow
+      el.classList.add('animate-in');
+      el.style.animationDelay = (i * 0.07) + 's';
+    });
     document.getElementById('output').scrollIntoView({behavior:'smooth',block:'start'});
 
   } catch(e) {
@@ -1120,9 +1240,7 @@ async function generate() {
   btn.innerHTML = '✦ Generate Pre-Call Brief';
 }
 
-// ── INIT ──
-renderAccountList();
-buildWatchlist();
+// ── INIT (moved to end) ──
 
 // ── WATCHLIST ──
 async function buildWatchlist() {
@@ -1152,8 +1270,8 @@ async function buildWatchlist() {
   var today = new Date().toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
 
   try {
-    var watchlistPrompt = 'You are a senior CSM analyzing a portfolio. Based on these account notes, identify which accounts need attention THIS WEEK. Today is ' + today + '. ACCOUNTS: ' + accountSummaries.slice(0, 8000) + '. Return ONLY valid JSON: {"watchlist":[{"account":"name","priority":"high|medium|low","reason":"specific signal from notes","action":"concrete action max 8 words"}]}. Sort by priority high first. high=renewal risk/escalation/sponsor change/overdue commitment. medium=no recent contact/renewal in 30-60 days. low=healthy.';
-    var data = await groqCall(watchlistPrompt, 1000);
+    var wp = 'You are a senior CSM. Today is '+today+'. Analyze these accounts and identify which need attention THIS WEEK. ACCOUNTS: '+accountSummaries.slice(0,8000)+'. Return ONLY valid JSON no markdown: {"watchlist":[{"account":"","priority":"high|medium|low","reason":"specific signal from notes","action":"concrete action max 8 words"}]}. Sort by priority high first. high=renewal risk/escalation/sponsor change/overdue commitment. medium=no recent contact/renewal in 30-60 days. low=healthy.';
+    var data = await groqCall(wp, 1000);
     if (data.error) throw new Error(data.error);
 
     var list = data.watchlist || [];
@@ -1166,7 +1284,19 @@ async function buildWatchlist() {
       var badge = item.priority === 'high' ? '🔴 Urgent' : item.priority === 'medium' ? '🟡 Watch' : '🟢 Healthy';
       var div = document.createElement('div');
       div.className = 'wl-card priority-' + item.priority;
-      div.innerHTML = '<div class="wl-card-top"><div class="wl-card-name">' + item.account + '</div><span class="wl-badge ' + item.priority + '">' + badge + '</span></div><div class="wl-reason">' + item.reason + '</div><div class="wl-action">→ ' + item.action + '</div>';
+
+      // Calculate last brief age
+      var accs = getAccounts();
+      var accKey = item.account.toLowerCase();
+      var accData = accs[accKey];
+      var lastBriefHtml = '';
+      if (accData && accData.updatedAt) {
+        var daysSince = Math.floor((Date.now() - new Date(accData.updatedAt)) / (1000*60*60*24));
+        var briefColor = daysSince > 30 ? 'var(--red-text)' : daysSince > 14 ? 'var(--amber-text)' : 'var(--text-3)';
+        lastBriefHtml = '<div style="font-size:10px;margin-top:5px;color:' + briefColor + ';">Last activity: ' + (daysSince === 0 ? 'today' : daysSince + ' days ago') + (daysSince > 30 ? ' ⚠️' : '') + '</div>';
+      }
+
+      div.innerHTML = '<div class="wl-card-top"><div class="wl-card-name">' + item.account + '</div><span class="wl-badge ' + item.priority + '">' + badge + '</span></div><div class="wl-reason">' + item.reason + '</div><div class="wl-action">→ ' + item.action + '</div>' + lastBriefHtml;
       var accountKey = item.account.toLowerCase();
       div.addEventListener('click', function(k){ return function(){ loadAccount(k); }; }(accountKey));
       return div;
@@ -1212,11 +1342,285 @@ function setupPrint() {
 }
 setupPrint();
 
-// Show onboarding only on first visit
+// Show onboarding overlay only on first visit
 if (!localStorage.getItem('callprep_onboarded')) {
   document.getElementById('onboarding-overlay').classList.remove('hidden');
 } else {
   document.getElementById('onboarding-overlay').classList.add('hidden');
+  // On return visits with no saved accounts, pre-load the at-risk demo silently
+  var existingAccounts = getAccounts();
+  if (Object.keys(existingAccounts).length === 0) {
+    loadDemo('atrisk');
+  }
+}
+
+// ── INIT ──
+renderAccountList();
+buildWatchlist();
+
+
+
+async function draftFollowUp() {
+  var btn = event.target.closest('button');
+  var origText = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner" style="border-color:rgba(99,102,241,.3);border-top-color:var(--accent);width:13px;height:13px;border-width:2px;display:inline-block;border-radius:50%;animation:spin .7s linear infinite;vertical-align:-2px;margin-right:6px;"></span> Drafting...';
+
+  var account = document.getElementById('out-account').textContent;
+  var commitments = document.getElementById('out-commitments').innerText || '';
+  var risks = document.getElementById('out-risks').innerText || '';
+  var nextSteps = document.getElementById('out-next') ? document.getElementById('out-next').innerText : '';
+  var callType = document.getElementById('f-calltype').value;
+
+  try {
+    var fp = 'You are a senior CSM. Write a professional follow-up email after a '+callType+' call with '+account+'. Commitments: '+commitments+'. Risks: '+risks+'. Next steps: '+nextSteps+'. Return ONLY valid JSON no markdown: {"subject":"subject line","email":"full email body plain text"}';
+    var d2 = await groqCall(fp, 800);
+    var emailBody = 'Subject: '+(d2.subject||'')+' | '+(d2.email||'Could not generate.');
+    showExtra('Follow-up email draft — ' + account, emailBody);
+  } catch(e) {
+    showExtra('Error', e.message);
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = origText;
+}
+
+async function summarizeCall() {
+  var btn = event.target.closest('button');
+  var origText = btn.innerHTML;
+  openTranscriptModal();
+  window._summaryBtn = btn;
+  window._summaryOrigText = origText;
+}
+
+async function runSummarizeCall(transcript) {
+  var btn = window._summaryBtn;
+  var origText = window._summaryOrigText;
+  if (!transcript || !transcript.trim()) return;
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner" style="border-color:rgba(255,255,255,.2);border-top-color:var(--text-2);width:13px;height:13px;border-width:2px;display:inline-block;border-radius:50%;animation:spin .7s linear infinite;vertical-align:-2px;margin-right:6px;"></span> Summarizing...';
+
+  var account = document.getElementById('f-account').value || document.getElementById('out-account').textContent || 'Account';
+
+  try {
+    var sp = 'You are a senior CSM summarizing a call for '+account+'. TRANSCRIPT: '+transcript.slice(0,8000)+'. Return ONLY valid JSON no markdown: {"decisions":[""],"commitments":[""],"next_steps":[""],"key_quote":"","sentiment":"positive|neutral|concerned|at-risk","one_liner":""}';
+    var data = await groqCall(sp, 800);
+    if (data.error) throw new Error(data.error);
+    var text = 'DECISIONS MADE:\n' + (data.decisions||[]).join('\n') + '\n\nCOMMITMENTS TAKEN:\n' + (data.commitments||[]).join('\n') + '\n\nNEXT STEPS:\n' + (data.next_steps||[]).join('\n') + '\n\nKEY QUOTE:\n' + (data.key_quote||'');
+    showExtra('Call summary — ' + account, text);
+
+    var saveNote = confirm('Save this summary to ' + account + ' account history?');
+    if (saveNote) {
+      var accounts = getAccounts();
+      var key = account.toLowerCase();
+      if (accounts[key]) {
+        var today = new Date().toLocaleDateString('en-GB', {day:'numeric', month:'short', year:'numeric'});
+        accounts[key].sessions.push({ notes: transcript, date: today });
+        accounts[key].updatedAt = new Date().toISOString();
+        saveAccounts(accounts);
+        renderAccountList();
+        buildWatchlist();
+        document.getElementById('saved-indicator').classList.add('visible');
+        setTimeout(function(){ document.getElementById('saved-indicator').classList.remove('visible'); }, 2500);
+      }
+    }
+  } catch(e) {
+    showExtra('Error', e.message);
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = origText;
+}
+
+function openTranscriptModal() {
+  document.getElementById('transcript-modal').style.display = 'flex';
+  document.getElementById('transcript-input').value = '';
+  document.getElementById('transcript-input').focus();
+}
+
+function closeTranscriptModal() {
+  document.getElementById('transcript-modal').style.display = 'none';
+}
+
+async function submitTranscript() {
+  var text = document.getElementById('transcript-input').value.trim();
+  if (!text) return;
+  closeTranscriptModal();
+  await runSummarizeCall(text);
+}
+
+function showExtra(title, content) {
+  document.getElementById('extra-title').textContent = title;
+  document.getElementById('extra-content').textContent = content;
+  document.getElementById('extra-output').style.display = 'block';
+  document.getElementById('extra-output').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function submitFeedback(type) {
+  const bar = document.getElementById('feedback-bar');
+  const account = document.getElementById('out-account').textContent || 'unknown';
+
+  // Store locally
+  const key = 'debrief_feedback';
+  const existing = JSON.parse(localStorage.getItem(key) || '[]');
+  existing.push({ type, account, date: new Date().toISOString() });
+  localStorage.setItem(key, JSON.stringify(existing));
+
+  // Visual confirmation
+  const positive = type === 'yes';
+  bar.innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;width:100%;">
+      <span style="font-size:18px;">${positive ? '🙏' : '📝'}</span>
+      <div>
+        <div style="font-size:13px;font-weight:500;color:var(--text);">${positive ? 'Thanks — glad it helped!' : 'Thanks for the feedback.'}</div>
+        <div style="font-size:12px;color:var(--text-3);margin-top:2px;">${positive ? 'Share Debrief with your team if it saves you time.' : 'Thanks for letting me know. Reach out on LinkedIn anytime.'}</div>
+      </div>
+    </div>`;
+  bar.style.borderColor = positive ? 'var(--green-border)' : 'var(--border)';
+  bar.style.background = positive ? 'var(--green-bg)' : 'var(--surface)';
+}
+
+function exportNotes() {
+  var account = document.getElementById('out-account').textContent || 'Account';
+  var callType = document.getElementById('out-meta').textContent || '';
+  var date = new Date().toLocaleDateString('en-GB', {day:'numeric',month:'long',year:'numeric'});
+
+  var sections = [];
+  sections.push('# ' + account + ' — Pre-Call Brief');
+  sections.push('**' + callType + '** · Generated ' + date);
+  sections.push('');
+
+  var read = document.getElementById('out-read').textContent;
+  if (read) { sections.push('## Account Overview'); sections.push(read); sections.push(''); }
+
+  var df = document.getElementById('out-df-text').textContent;
+  if (df) { sections.push("## ⚠️ Don't Forget"); sections.push(df); sections.push(''); }
+
+  var sentiment = document.querySelector('.sentiment-card');
+  if (sentiment) {
+    var sentLabel = sentiment.querySelector('.sentiment-label');
+    var sentRead = sentiment.querySelector('.sentiment-read');
+    var opener = sentiment.querySelector('.sentiment-opener');
+    sections.push('## Client Sentiment');
+    if (sentLabel) sections.push('**' + sentLabel.textContent + '**');
+    if (sentRead) sections.push(sentRead.textContent);
+    if (opener) sections.push('Opening line: ' + opener.textContent.replace('💬 "','').replace('"',''));
+    sections.push('');
+  }
+
+  var tlItems = document.querySelectorAll('.tl-item');
+  if (tlItems.length) {
+    sections.push('## Account Timeline');
+    tlItems.forEach(function(item) {
+      var date2 = item.querySelector('.tl-date');
+      var title = item.querySelector('.tl-title');
+      var detail = item.querySelector('.tl-detail');
+      if (date2 && title) sections.push('- **' + date2.textContent + '** — ' + title.textContent + (detail ? ': ' + detail.textContent : ''));
+    });
+    sections.push('');
+  }
+
+  var commitments = document.querySelectorAll('.commitment-item');
+  if (commitments.length) {
+    sections.push('## Open Commitments');
+    commitments.forEach(function(c) {
+      var what = c.querySelector('.commitment-what');
+      var meta = c.querySelector('.commitment-meta');
+      if (what) sections.push('- ' + what.textContent + (meta ? ' (' + meta.textContent.trim().replace(/\s+/g,' ') + ')' : ''));
+    });
+    sections.push('');
+  }
+
+  var risks = document.querySelectorAll('.risk-item');
+  if (risks.length) {
+    sections.push('## Risk Signals');
+    risks.forEach(function(r) {
+      var sig = r.querySelector('.risk-signal');
+      var why = r.querySelector('.risk-why');
+      if (sig) sections.push('- **' + sig.textContent + '**' + (why ? ' — ' + why.textContent : ''));
+    });
+    sections.push('');
+  }
+
+  var questions = document.querySelectorAll('.question-item');
+  if (questions.length) {
+    sections.push('## Questions to Ask');
+    questions.forEach(function(q, i) {
+      var qt = q.querySelector('.question-text');
+      var qw = q.querySelector('.question-why');
+      if (qt) sections.push((i+1) + '. ' + qt.textContent + (qw ? ' (' + qw.textContent + ')' : ''));
+    });
+    sections.push('');
+  }
+
+  var extra = document.getElementById('extra-content');
+  if (extra && extra.textContent.trim()) {
+    var extraTitle = document.getElementById('extra-title');
+    sections.push('## ' + (extraTitle ? extraTitle.textContent : 'Additional'));
+    sections.push(extra.textContent);
+    sections.push('');
+  }
+
+  sections.push('---');
+  sections.push('Generated by Debrief · https://call-prep-uokh.vercel.app');
+
+  var markdown = sections.join('\n');
+  navigator.clipboard.writeText(markdown).then(function() {
+    var btns = document.querySelectorAll('.print-btn');
+    btns.forEach(function(b) {
+      if (b.textContent.includes('Export')) {
+        var orig = b.innerHTML;
+        b.innerHTML = '✓ Copied to clipboard';
+        b.style.color = 'var(--green-text)';
+        b.style.borderColor = 'var(--green-border)';
+        setTimeout(function(){ b.innerHTML = orig; b.style.color = ''; b.style.borderColor = ''; }, 2500);
+      }
+    });
+  }).catch(function() {
+    var blob = new Blob([markdown], {type:'text/plain'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = account.replace(/[^a-z0-9]/gi,'_') + '_brief.md';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+}
+
+function shareToolLinkedIn() {
+  const text = `I built an AI tool for CSMs that solves a real problem: stop spending hours reconstructing account history before a QBR.
+
+Paste your raw notes — emails, call logs, tickets — and get a structured pre-call brief in 30 seconds:
+✅ Chronological timeline
+⚠️ Open commitments you forgot about
+🔴 Risk signals hidden in your notes
+💬 Questions tailored to that specific account
+
+Try it here → https://call-prep-uokh.vercel.app
+
+Built from scratch as part of my AI portfolio. #CustomerSuccess #CSM #AI #Productivity`;
+
+  const url = 'https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent('https://call-prep-uokh.vercel.app');
+  
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('share-btn');
+    btn.innerHTML = '✓ Caption copied — opening LinkedIn';
+    btn.style.background = 'var(--green-bg)';
+    btn.style.borderColor = 'var(--green-border)';
+    btn.style.color = 'var(--green-text)';
+    setTimeout(() => {
+      window.open(url, '_blank');
+      setTimeout(() => {
+        btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg> Share this tool';
+        btn.style.background = 'var(--accent-light)';
+        btn.style.borderColor = 'var(--accent-border)';
+        btn.style.color = 'var(--accent)';
+      }, 3000);
+    }, 800);
+  }).catch(() => {
+    window.open(url, '_blank');
+  });
 }
 </script>
 </body>
