@@ -805,7 +805,7 @@ async function initAuth() {
 
 async function loadProfile() {
   if (!_supabase || !currentUser) return;
-  var r = await _supabase.from("profiles").select("*").eq("id", currentUser.id).single();
+  var r = await _supabase.from("profiles").select("*").eq("id", currentUser.id).maybeSingle();
   if (r.data) { currentPlan = r.data.plan || "free"; briefsUsedThisMonth = r.data.briefs_count || 0; }
   else { await _supabase.from("profiles").insert({ id: currentUser.id, email: currentUser.email, plan: "free", briefs_count: 0 }); }
 }
@@ -872,7 +872,7 @@ async function incrementBriefCount() {
 async function saveAccountToCloud(name, callType, lastContext, sessions) {
   if (!_supabase || !currentUser) return;
   try {
-    var existing = await _supabase.from("accounts").select("id").eq("user_id", currentUser.id).eq("name", name).single();
+    var existing = await _supabase.from("accounts").select("id").eq("user_id", currentUser.id).eq("name", name).maybeSingle();
     var accountId;
     if (existing.data) {
       accountId = existing.data.id;
