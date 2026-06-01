@@ -876,7 +876,7 @@ initAuth();
 function openUpgrade() {
   if (!currentUser) { openAuthModal(); return; }
   var email = currentUser.email || '';
-  var url = 'https://buy.stripe.com/14AeVddsq9F96zt6F5b3q00?prefilled_email=' + encodeURIComponent(email);
+  var url = 'https://buy.stripe.com/14AeVddsq9F96zt6F5b3q00?locale=en&prefilled_email=' + encodeURIComponent(email);
   window.open(url, '_blank');
 }
 
