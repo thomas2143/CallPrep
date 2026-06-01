@@ -823,6 +823,7 @@ function updateHeaderUI() {
     planEl.className = 'user-plan' + (currentPlan === 'pro' ? ' pro' : '');
     var upgradeBtn = document.getElementById('upgrade-btn');
     if (upgradeBtn) upgradeBtn.style.display = currentPlan === 'pro' ? 'none' : 'block';
+    if (currentUser) loadAccountsFromCloud();
   } else {
     loginBtn.style.display = 'block'; logoutBtn.style.display = 'none'; userInfo.style.display = 'none';
   }
@@ -868,6 +869,68 @@ async function incrementBriefCount() {
 }
 
 initAuth();
+
+// ── CLOUD SYNC ──
+async function saveAccountToCloud(name, callType, lastContext, sessions) {
+  if (!_supabase || !currentUser) return;
+  try {
+    var existing = await _supabase.from('accounts').select('id').eq('user_id', currentUser.id).eq('name', name).single();
+    var accountId;
+    if (existing.data) {
+      accountId = existing.data.id;
+      await _supabase.from('accounts').update({
+        call_type: callType,
+        last_context: lastContext || '',
+        updated_at: new Date().toISOString()
+      }).eq('id', accountId);
+    } else {
+      var ins = await _supabase.from('accounts').insert({
+        user_id: currentUser.id,
+        name: name,
+        call_type: callType,
+        last_context: lastContext || '',
+        updated_at: new Date().toISOString()
+      }).select().single();
+      accountId = ins.data && ins.data.id;
+    }
+    if (!accountId || !sessions || sessions.length === 0) return;
+    // Sync sessions
+    var existing_sessions = await _supabase.from('sessions').select('id').eq('account_id', accountId);
+    if (!existing_sessions.data || existing_sessions.data.length < sessions.length) {
+      var lastSession = sessions[sessions.length - 1];
+      await _supabase.from('sessions').insert({
+        account_id: accountId,
+        user_id: currentUser.id,
+        notes: lastSession.notes,
+        date: lastSession.date || new Date().toLocaleDateString('en-GB')
+      });
+    }
+  } catch(e) { console.log('Cloud sync error:', e.message); }
+}
+
+async function loadAccountsFromCloud() {
+  if (!_supabase || !currentUser) return;
+  try {
+    var result = await _supabase.from('accounts').select('*, sessions(*)').eq('user_id', currentUser.id);
+    if (!result.data || result.data.length === 0) return;
+    var local = getAccounts();
+    result.data.forEach(function(acc) {
+      var key = acc.name.toLowerCase();
+      if (!local[key]) {
+        local[key] = {
+          name: acc.name,
+          callType: acc.call_type || 'QBR',
+          lastContext: acc.last_context || '',
+          sessions: (acc.sessions || []).map(function(s) {{ return { notes: s.notes, date: s.date }; }}),
+          updatedAt: acc.updated_at
+        };
+      }
+    });
+    saveAccounts(local);
+    renderAccountList();
+    buildWatchlist();
+  } catch(e) { console.log('Cloud load error:', e.message); }
+}
 
 // ── STRIPE ──
 
@@ -1102,6 +1165,7 @@ function saveCurrentAccount() {
   accounts[key].lastContext = context;
   accounts[key].updatedAt = new Date().toISOString();
   saveAccounts(accounts);
+  saveAccountToCloud(name, callType, context, accounts[key].sessions);
 
   showSavedIndicator();
   renderAccountList();
