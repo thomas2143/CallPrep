@@ -893,21 +893,23 @@ async function saveAccountToCloud(name, callType, lastContext, sessions) {
 async function loadAccountsFromCloud() {
   if (!_supabase || !currentUser) return;
   try {
-    var result = await _supabase.from("accounts").select("*, sessions(*)").eq("user_id", currentUser.id);
+    var result = await _supabase.from("accounts").select("*").eq("user_id", currentUser.id);
     if (!result.data || result.data.length === 0) return;
     var local = getAccounts();
-    result.data.forEach(function(acc) {
+    for (var i = 0; i < result.data.length; i++) {
+      var acc = result.data[i];
       var key = acc.name.toLowerCase();
       if (!local[key]) {
+        var sessResult = await _supabase.from("sessions").select("*").eq("account_id", acc.id);
         local[key] = {
           name: acc.name,
           callType: acc.call_type || "QBR",
           lastContext: acc.last_context || "",
-          sessions: (acc.sessions || []).map(function(s) { return { notes: s.notes, date: s.date }; }),
+          sessions: (sessResult.data || []).map(function(s) { return { notes: s.notes, date: s.date }; }),
           updatedAt: acc.updated_at
         };
       }
-    });
+    }
     saveAccounts(local);
     renderAccountList();
     buildWatchlist();
