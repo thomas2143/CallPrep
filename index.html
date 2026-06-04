@@ -1107,6 +1107,33 @@ function getProfileContext() {
   return "\n\nCSM PROFILE (adapt the brief to this person): " + parts.join(", ") + ".";
 }
 
+// -- HEALTH SCORE --
+function calculateHealthScore(data) {
+  var score = 70;
+  var sentiment = data.sentiment || "neutral";
+  if (sentiment === "at-risk") score -= 30;
+  else if (sentiment === "concerned") score -= 15;
+  else if (sentiment === "positive") score += 15;
+  var commitments = data.open_commitments || [];
+  var overdue = commitments.filter(function(c) { return c.status === "overdue"; }).length;
+  var pending = commitments.filter(function(c) { return c.status === "pending"; }).length;
+  score -= Math.min(overdue * 15, 30);
+  score -= Math.min(pending * 5, 15);
+  var risks = data.risk_signals || [];
+  score -= Math.min(risks.length * 10, 30);
+  return Math.max(0, Math.min(100, score));
+}
+function getHealthColor(score) {
+  if (score < 40) return "#ef4444";
+  if (score < 70) return "#f59e0b";
+  return "#10b981";
+}
+function getHealthEmoji(score) {
+  if (score < 40) return "🔴";
+  if (score < 70) return "🟡";
+  return "🟢";
+}
+
 function openUpgrade() {
   if (!currentUser) { openAuthModal(); return; }
   var email = currentUser.email || "";
@@ -1530,8 +1557,21 @@ async function generate() {
     if (data.error) throw new Error(data.error);
 
     // Header
-    document.getElementById('out-account').textContent = data.account_name || account || 'Account';
-    document.getElementById('out-meta').textContent = `${data.call_type || callType} · Pre-call brief · ${new Date().toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'})}`;
+    var healthScore = calculateHealthScore(data);
+    var healthColor = getHealthColor(healthScore);
+    var healthEmoji = getHealthEmoji(healthScore);
+
+    var accountEl = document.getElementById('out-account');
+    accountEl.innerHTML = '';
+    var nameSpan = document.createElement('span');
+    nameSpan.textContent = data.account_name || account || 'Account';
+    var scoreSpan = document.createElement('span');
+    scoreSpan.textContent = healthEmoji + ' ' + healthScore;
+    scoreSpan.style.cssText = 'font-size:18px;font-weight:700;color:' + healthColor + ';margin-left:12px;';
+    accountEl.appendChild(nameSpan);
+    accountEl.appendChild(scoreSpan);
+
+    document.getElementById('out-meta').textContent = (data.call_type || callType) + ' · Pre-call brief · ' + new Date().toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'});
     document.getElementById('out-read').textContent = data.account_read || '';
     document.getElementById('out-df-text').textContent = data.dont_forget || '';
 
