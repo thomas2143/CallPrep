@@ -885,7 +885,7 @@ var _supabase = window.supabase ? window.supabase.createClient("https://ybqqgtab
 var currentUser = null;
 var currentPlan = "free";
 var briefsUsedThisMonth = 0;
-var FREE_BRIEF_LIMIT = 5;
+var FREE_BRIEF_LIMIT = 10;
 
 async function initAuth() {
   if (!_supabase) return;
@@ -1514,7 +1514,7 @@ async function generate() {
   var demoAccounts = ['nova corp', 'orbit analytics', 'brightfield co'];
   var isDemo = demoAccounts.indexOf(account.toLowerCase()) !== -1 || !account;
   if (!isDemo && !canGenerateBrief()) {
-    if (confirm('You have used your 5 free briefs this month.\n\nUpgrade to Debrief Pro for $9/month.\n\nClick OK to upgrade.')) { openUpgrade(); }
+    if (confirm('You have used your 10 free briefs this month.\n\nUpgrade to Debrief Pro for $9/month.\n\nClick OK to upgrade.')) { openUpgrade(); }
     return;
   }
 
