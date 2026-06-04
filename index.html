@@ -52,7 +52,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
 
 /* LAYOUT */
 .main{display:grid;grid-template-columns:380px 1fr;gap:0;min-height:calc(100vh - 88px);}
-.panel-left{background:var(--surface);border-right:1px solid var(--border);padding:24px;display:flex;flex-direction:column;gap:14px;overflow-y:auto;height:calc(100vh - 73px);position:sticky;top:0;min-height:0;}
+.panel-left{background:var(--surface);border-right:1px solid var(--border);padding:24px;display:flex;flex-direction:column;gap:14px;overflow-y:auto;overflow-x:hidden;height:calc(100vh - 73px);position:sticky;top:0;min-height:0;}
 .panel-right{padding:32px 36px;overflow-y:auto;background:var(--bg);}
 
 .section-label{font-family:var(--font-heading);font-size:11px;font-weight:600;color:var(--text-3);letter-spacing:1.4px;text-transform:uppercase;margin-bottom:10px;}
@@ -453,7 +453,10 @@ textarea::placeholder{color:var(--text-3);font-style:italic;font-family:var(--fo
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
         Weekly watchlist
       </div>
-      <button class="watchlist-refresh" onclick="buildWatchlist()">↻ Refresh</button>
+      <div style="display:flex;gap:8px;">
+        <button class="watchlist-refresh" onclick="generateWeeklyDebrief()" id="weekly-debrief-btn">📊 Weekly Debrief</button>
+        <button class="watchlist-refresh" onclick="buildWatchlist()">↻ Refresh</button>
+      </div>
     </div>
     <div id="watchlist-body">
       <div class="watchlist-empty">Save at least one account to see your watchlist.</div>
@@ -508,7 +511,7 @@ textarea::placeholder{color:var(--text-3);font-style:italic;font-family:var(--fo
     </div>
 
     <!-- NOTES — main focus, takes max space -->
-    <div style="display:flex;flex-direction:column;flex:1;min-height:180px;overflow:hidden;">
+    <div style="display:flex;flex-direction:column;flex:1;min-height:160px;overflow:hidden;">
       <div class="notes-label-row">
         <div style="display:flex;align-items:center;gap:8px;">
           <div class="section-label" style="margin-bottom:0;">Your notes</div>
@@ -516,7 +519,7 @@ textarea::placeholder{color:var(--text-3);font-style:italic;font-family:var(--fo
         </div>
         <div class="notes-actions">
           <span class="saved-indicator" id="saved-indicator">✓ Saved</span>
-          <button onclick="resetNotes()" style="font-size:11px;padding:2px 8px;border-radius:var(--radius-sm);border:1px solid var(--border);background:transparent;color:var(--text-3);cursor:pointer;font-family:var(--font-heading);transition:all .15s;" onmouseover="this.style.color='var(--red-text)';this.style.borderColor='var(--red)'" onmouseout="this.style.color='var(--text-3)';this.style.borderColor='var(--border)'">✕ Clear</button>
+          <button onclick="resetNotes()" style="font-size:11px;padding:2px 8px;border-radius:var(--radius-sm);border:1px solid var(--red-border);background:var(--red-bg);color:var(--red-text);cursor:pointer;font-family:var(--font-heading);font-weight:600;transition:all .15s;" onmouseover="this.style.background='rgba(239,68,68,.25)'" onmouseout="this.style.background='var(--red-bg)'">✕ Clear</button>
           <span class="char-count" id="char-count">0 chars</span>
         </div>
       </div>
@@ -555,8 +558,11 @@ The AI handles the mess — that's the point."
       ✦ Generate Pre-Call Brief
     </button>
 
+    <!-- BRIEFS COUNTER -->
+    <div id="briefs-counter" style="display:none;text-align:center;font-size:11px;color:var(--text-3);font-family:var(--font-heading);padding:4px 0;"></div>
+
     <!-- SAVE -->
-    <button class="save-btn" onclick="saveCurrentAccount()" style="width:100%;padding:8px;font-size:12px;opacity:.8;">💾 Save account notes</button>
+    <button class="save-btn" onclick="saveCurrentAccount()" id="save-account-btn" style="width:100%;padding:8px;font-size:12px;opacity:.8;">💾 Save account notes</button>
 
     <div class="divider"></div>
 
@@ -759,6 +765,24 @@ Example:
   </div>
 </div>
 
+<!-- WEEKLY DEBRIEF MODAL -->
+<div id="weekly-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:center;justify-content:center;padding:24px;">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px 32px;max-width:680px;width:100%;box-shadow:0 24px 64px rgba(0,0,0,.6);max-height:80vh;overflow-y:auto;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <div>
+        <div style="font-family:var(--font-heading);font-size:18px;font-weight:600;color:var(--text);">📊 Weekly Debrief</div>
+        <div style="font-size:12px;color:var(--text-3);margin-top:2px;" id="weekly-date"></div>
+      </div>
+      <button onclick="closeWeeklyModal()" style="background:transparent;border:none;color:var(--text-3);cursor:pointer;font-size:20px;padding:2px 6px;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text-3)'">×</button>
+    </div>
+    <div id="weekly-content" style="font-size:14px;line-height:1.8;color:var(--text-2);white-space:pre-wrap;"></div>
+    <div style="margin-top:20px;display:flex;gap:10px;justify-content:flex-end;">
+      <button onclick="copyWeeklyDebrief()" style="font-family:var(--font-heading);font-size:13px;font-weight:500;padding:9px 18px;border-radius:var(--radius-sm);border:1px solid var(--accent-border);background:var(--accent-light);color:var(--accent);cursor:pointer;" id="copy-weekly-btn">📋 Copy</button>
+      <button onclick="closeWeeklyModal()" style="font-family:var(--font-heading);font-size:13px;padding:9px 18px;border-radius:var(--radius-sm);border:1px solid var(--border);background:transparent;color:var(--text-2);cursor:pointer;">Close</button>
+    </div>
+  </div>
+</div>
+
 <!-- FOOTER -->
 <div style="background:var(--surface);border-top:1px solid var(--border);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
   <div style="display:flex;align-items:center;gap:8px;">
@@ -823,7 +847,10 @@ function updateHeaderUI() {
     planEl.className = "user-plan" + (currentPlan === "pro" ? " pro" : "");
     var upgradeBtn = document.getElementById("upgrade-btn");
     if (upgradeBtn) upgradeBtn.style.display = currentPlan === "pro" ? "none" : "block";
+    updateBriefCounter();
     loadAccountsFromCloud();
+    var saveBtn = document.getElementById("save-account-btn");
+    if (saveBtn) saveBtn.title = "Saved to your account — accessible on any device";
   } else {
     loginBtn.style.display = "block"; logoutBtn.style.display = "none"; userInfo.style.display = "none";
   }
@@ -866,6 +893,34 @@ async function incrementBriefCount() {
   if (!_supabase || !currentUser) return;
   briefsUsedThisMonth++;
   await _supabase.from("profiles").update({ briefs_count: briefsUsedThisMonth }).eq("id", currentUser.id);
+  updateBriefCounter();
+}
+
+function updateBriefCounter() {
+  var counter = document.getElementById("briefs-counter");
+  if (!counter) return;
+  if (!currentUser) {
+    counter.style.display = "none";
+    return;
+  }
+  if (currentPlan === "pro") {
+    counter.style.display = "block";
+    counter.textContent = "Pro — unlimited briefs";
+    counter.style.color = "var(--green-text)";
+    return;
+  }
+  var remaining = FREE_BRIEF_LIMIT - briefsUsedThisMonth;
+  counter.style.display = "block";
+  if (remaining <= 0) {
+    counter.textContent = "0 briefs remaining this month";
+    counter.style.color = "var(--red-text)";
+  } else if (remaining === 1) {
+    counter.textContent = "1 brief remaining this month";
+    counter.style.color = "var(--amber-text)";
+  } else {
+    counter.textContent = remaining + " of " + FREE_BRIEF_LIMIT + " free briefs remaining";
+    counter.style.color = "var(--text-3)";
+  }
 }
 
 // -- CLOUD SYNC --
@@ -936,6 +991,14 @@ if (window.location.search.includes("upgraded=true")) {
 }
 
 initAuth();
+
+// Update security note based on login
+function updateSecurityNote() {
+  var note = document.querySelector(".panel-left [stroke-width=\"2.5\"]")
+    ? document.querySelector(".panel-left [stroke-width=\"2.5\"]").parentElement
+    : null;
+}
+
 
 var GROQ_KEY = "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";
 
@@ -1313,7 +1376,9 @@ async function generate() {
   const callType = document.getElementById('f-calltype').value;
 
   if (!notes) { alert('Please paste your account notes first.'); return; }
-  if (!canGenerateBrief()) {
+  var demoAccounts = ['nova corp', 'orbit analytics', 'brightfield co'];
+  var isDemo = demoAccounts.indexOf(account.toLowerCase()) !== -1 || !account;
+  if (!isDemo && !canGenerateBrief()) {
     if (confirm('You have used your 5 free briefs this month.\n\nUpgrade to Debrief Pro for $9/month.\n\nClick OK to upgrade.')) { openUpgrade(); }
     return;
   }
@@ -1798,6 +1863,69 @@ function exportNotes() {
     a.click();
     URL.revokeObjectURL(url);
   });
+}
+
+function closeWeeklyModal() {
+  document.getElementById("weekly-modal").style.display = "none";
+}
+
+function copyWeeklyDebrief() {
+  var text = document.getElementById("weekly-content").textContent;
+  navigator.clipboard.writeText(text).then(function() {
+    var btn = document.getElementById("copy-weekly-btn");
+    btn.textContent = "✓ Copied";
+    setTimeout(function(){ btn.textContent = "📋 Copy"; }, 2000);
+  });
+}
+
+async function generateWeeklyDebrief() {
+  var accounts = getAccounts();
+  var keys = Object.keys(accounts);
+  if (keys.length === 0) {
+    alert("No saved accounts yet. Save at least one account to generate your weekly debrief.");
+    return;
+  }
+
+  var btn = document.getElementById("weekly-debrief-btn");
+  var origText = btn.textContent;
+  btn.textContent = "Generating...";
+  btn.disabled = true;
+
+  var today = new Date().toLocaleDateString("en-GB", {weekday:"long", day:"numeric", month:"long", year:"numeric"});
+  var weekStart = new Date();
+  weekStart.setDate(weekStart.getDate() - 7);
+  var weekStartStr = weekStart.toLocaleDateString("en-GB", {day:"numeric", month:"long"});
+
+  var accountSummaries = [];
+  for (var i = 0; i < keys.length; i++) {
+    var key = keys[i];
+    var acc = accounts[key];
+    var sessions = acc.sessions || [];
+    var daysSince = acc.updatedAt ? Math.floor((Date.now() - new Date(acc.updatedAt)) / (1000*60*60*24)) : 99;
+    var notesText = sessions.map(function(s){ return s.notes; }).join(" | ").slice(0, 2000);
+    accountSummaries.push("ACCOUNT: " + acc.name + " | Last activity: " + daysSince + " days ago | Sessions: " + sessions.length + " | NOTES: " + notesText);
+  }
+
+  var prompt = "You are a senior Customer Success Manager reviewing your week. Today is " + today + ". The week started " + weekStartStr + ".\n\nHere are all your accounts and their notes:\n\n" + accountSummaries.join("\n\n---\n\n") + "\n\nGenerate a professional weekly debrief report. Structure it as follows:\n\n# Weekly CS Debrief — " + today + "\n\n## This Week At a Glance\n[2-3 sentence summary of the week]\n\n## Accounts Requiring Immediate Attention\n[List accounts with urgent signals — renewal risk, overdue commitments, silent clients]\n\n## Wins This Week\n[Positive signals, progress made, commitments kept]\n\n## Open Commitments to Follow Up\n[List all unresolved commitments across accounts]\n\n## Looking Ahead — Next Week Priorities\n[Top 3 actions to take next week]\n\nBe specific. Reference actual account names and situations from the notes. Write as if you are the CSM reflecting on their own week.";
+
+  try {
+    var j = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {"Content-Type":"application/json","Authorization":"Bearer " + GROQ_KEY},
+      body: JSON.stringify({model:"llama-3.3-70b-versatile", max_tokens:1500, temperature:0.2, messages:[{role:"user",content:prompt}]})
+    });
+    var data = await j.json();
+    var text = data.choices && data.choices[0] ? data.choices[0].message.content : "Could not generate debrief.";
+
+    document.getElementById("weekly-date").textContent = "Week of " + weekStartStr + " — " + today;
+    document.getElementById("weekly-content").textContent = text;
+    document.getElementById("weekly-modal").style.display = "flex";
+  } catch(e) {
+    alert("Could not generate weekly debrief: " + e.message);
+  }
+
+  btn.textContent = origText;
+  btn.disabled = false;
 }
 
 function shareToolLinkedIn() {
