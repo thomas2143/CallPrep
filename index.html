@@ -348,6 +348,13 @@ textarea::placeholder{color:var(--text-3);font-style:italic;font-family:var(--fo
 .logout-btn:hover{border-color:var(--red);color:var(--red-text);}
 .login-btn{font-size:12px;padding:6px 14px;border-radius:var(--radius-sm);border:none;background:var(--accent);color:white;cursor:pointer;font-family:var(--font-heading);font-weight:600;transition:all .15s;}
 .login-btn:hover{background:var(--accent-hover);}
+
+/* PROFILE MODAL */
+.profile-modal{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:300;display:flex;align-items:center;justify-content:center;padding:24px;}
+.profile-modal.hidden{display:none;}
+.profile-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:36px 40px;max-width:480px;width:100%;box-shadow:0 24px 64px rgba(0,0,0,.6);}
+.profile-select{font-family:var(--font-body);font-size:13px;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);background:var(--surface-2);outline:none;width:100%;margin-bottom:12px;cursor:pointer;}
+.profile-select:focus{border-color:var(--accent);}
 </style>
 </head>
 <body>
@@ -783,6 +790,69 @@ Example:
   </div>
 </div>
 
+<!-- PROFILE MODAL -->
+<div class="profile-modal hidden" id="profile-modal">
+  <div class="profile-card">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+      <svg width="28" height="28" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="border-radius:7px;flex-shrink:0;">
+        <defs><linearGradient id="pg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6366f1"/><stop offset="1" stop-color="#3b82f6"/></linearGradient></defs>
+        <rect width="32" height="32" rx="8" fill="url(#pg)"/>
+        <text x="7" y="24" font-family="Georgia,serif" font-size="22" font-weight="700" fill="white">D</text>
+      </svg>
+      <div style="font-family:var(--font-heading);font-size:20px;font-weight:600;color:var(--text);">Your CS Profile</div>
+    </div>
+    <div style="font-size:13px;color:var(--text-2);margin-bottom:24px;line-height:1.6;">Help Debrief tailor every brief to your style and context. Takes 30 seconds.</div>
+
+    <label style="font-size:12px;font-weight:500;color:var(--text-2);display:block;margin-bottom:6px;">Your role</label>
+    <select class="profile-select" id="p-role">
+      <option value="">Select your role</option>
+      <option value="Customer Success Manager">Customer Success Manager</option>
+      <option value="Senior CSM">Senior CSM</option>
+      <option value="Implementation Manager">Implementation Manager</option>
+      <option value="Account Manager">Account Manager</option>
+      <option value="Customer Success Lead">Customer Success Lead</option>
+      <option value="Head of Customer Success">Head of Customer Success</option>
+    </select>
+
+    <label style="font-size:12px;font-weight:500;color:var(--text-2);display:block;margin-bottom:6px;">Your industry</label>
+    <select class="profile-select" id="p-industry">
+      <option value="">Select your industry</option>
+      <option value="SaaS / Software">SaaS / Software</option>
+      <option value="Fintech">Fintech</option>
+      <option value="EdTech">EdTech</option>
+      <option value="E-commerce">E-commerce</option>
+      <option value="Healthcare / MedTech">Healthcare / MedTech</option>
+      <option value="Marketing Technology">Marketing Technology</option>
+      <option value="HR Tech">HR Tech</option>
+      <option value="Other">Other</option>
+    </select>
+
+    <label style="font-size:12px;font-weight:500;color:var(--text-2);display:block;margin-bottom:6px;">Your primary focus</label>
+    <select class="profile-select" id="p-focus">
+      <option value="">Select your focus</option>
+      <option value="NRR and revenue growth">NRR and revenue growth</option>
+      <option value="Product adoption and onboarding">Product adoption and onboarding</option>
+      <option value="Churn prevention and retention">Churn prevention and retention</option>
+      <option value="Expansion and upsell">Expansion and upsell</option>
+      <option value="Implementation and time-to-value">Implementation and time-to-value</option>
+    </select>
+
+    <label style="font-size:12px;font-weight:500;color:var(--text-2);display:block;margin-bottom:6px;">Your communication style</label>
+    <select class="profile-select" id="p-style">
+      <option value="">Select your style</option>
+      <option value="direct and data-driven">Direct and data-driven</option>
+      <option value="empathetic and relationship-focused">Empathetic and relationship-focused</option>
+      <option value="formal and structured">Formal and structured</option>
+      <option value="casual and conversational">Casual and conversational</option>
+    </select>
+
+    <div style="display:flex;gap:10px;margin-top:20px;">
+      <button onclick="saveProfile()" style="flex:1;padding:12px;font-family:var(--font-heading);font-size:14px;font-weight:600;border-radius:var(--radius);border:none;background:linear-gradient(135deg,var(--accent-hover),var(--accent));color:white;cursor:pointer;box-shadow:0 4px 14px rgba(99,102,241,.3);">Save my profile</button>
+      <button onclick="closeProfileModal()" style="padding:12px 20px;font-family:var(--font-heading);font-size:13px;border-radius:var(--radius);border:1px solid var(--border);background:transparent;color:var(--text-2);cursor:pointer;">Skip</button>
+    </div>
+  </div>
+</div>
+
 <!-- FOOTER -->
 <div style="background:var(--surface);border-top:1px solid var(--border);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
   <div style="display:flex;align-items:center;gap:8px;">
@@ -850,6 +920,13 @@ function updateHeaderUI() {
     updateBriefCounter();
     loadAccountsFromCloud();
     var saveBtn = document.getElementById("save-account-btn");
+    // Show profile modal if never filled
+    setTimeout(function() {
+      loadProfileFromStorage();
+      if (!csProfile.role && !localStorage.getItem("debrief_profile_skipped")) {
+        openProfileModal();
+      }
+    }, 1500);
     if (saveBtn) saveBtn.title = "Saved to your account — accessible on any device";
   } else {
     loginBtn.style.display = "block"; logoutBtn.style.display = "none"; userInfo.style.display = "none";
@@ -972,6 +1049,51 @@ async function loadAccountsFromCloud() {
 }
 
 // -- STRIPE --
+// ── CSM PROFILE ──
+var csProfile = { role: "", industry: "", focus: "", style: "" };
+
+function openProfileModal() {
+  document.getElementById("profile-modal").classList.remove("hidden");
+}
+function closeProfileModal() {
+  document.getElementById("profile-modal").classList.add("hidden");
+  localStorage.setItem("debrief_profile_skipped", "1");
+}
+
+async function saveProfile() {
+  csProfile.role = document.getElementById("p-role").value;
+  csProfile.industry = document.getElementById("p-industry").value;
+  csProfile.focus = document.getElementById("p-focus").value;
+  csProfile.style = document.getElementById("p-style").value;
+
+  if (_supabase && currentUser) {
+    await _supabase.from("profiles").update({
+      role_title: csProfile.role,
+      industry: csProfile.industry,
+      cs_focus: csProfile.focus,
+      communication_style: csProfile.style
+    }).eq("id", currentUser.id);
+  }
+  localStorage.setItem("debrief_cs_profile", JSON.stringify(csProfile));
+  closeProfileModal();
+}
+
+function loadProfileFromStorage() {
+  var saved = localStorage.getItem("debrief_cs_profile");
+  if (saved) { try { csProfile = JSON.parse(saved); } catch(e) {} }
+}
+
+function getProfileContext() {
+  loadProfileFromStorage();
+  var parts = [];
+  if (csProfile.role) parts.push("Role: " + csProfile.role);
+  if (csProfile.industry) parts.push("Industry: " + csProfile.industry);
+  if (csProfile.focus) parts.push("Primary focus: " + csProfile.focus);
+  if (csProfile.style) parts.push("Communication style: " + csProfile.style);
+  if (parts.length === 0) return "";
+  return "\n\nCSM PROFILE (adapt the brief to this person): " + parts.join(", ") + ".";
+}
+
 function openUpgrade() {
   if (!currentUser) { openAuthModal(); return; }
   var email = currentUser.email || "";
@@ -1389,7 +1511,7 @@ async function generate() {
   try {
     var context = document.getElementById('f-context').value.trim();
     var contextStr = context ? ' ADDITIONAL CONTEXT: '+context : '';
-    var p1 = 'You are a senior CSM. Analyze notes and return ONLY valid JSON no markdown. ACCOUNT: '+account+' CALL TYPE: '+callType+contextStr+' NOTES: '+notes.slice(0,8000)+' Return: {"account_name":"","call_type":"","account_read":"2-3 sentence CSM reading of this account","sentiment":"positive|neutral|concerned|at-risk","sentiment_reason":"one sentence explaining the detected sentiment based on specific signals in the notes","opening_line":"the perfect first sentence to say when the call starts — tailored to the sentiment and account context. If at-risk: empathetic and direct. If positive: warm and forward-looking. If expansion: ambitious. Max 25 words.","timeline":[{"date":"","type":"call|email|ticket|commitment|win|risk","title":"max 6 words","detail":"one sentence","flag":"open_commitment|risk|win|neutral"}],"open_commitments":[{"what":"","promised_on":"","promised_by":"CSM|client|unknown","status":"overdue|pending|unclear","urgency":"high|medium|low"}],"risk_signals":[{"signal":"","why_it_matters":"one sentence"}],"questions_to_ask":[{"question":"","why":""}],"dont_forget":"most important thing for this call"}';
+    var p1 = 'You are a senior CSM. Analyze notes and return ONLY valid JSON no markdown. ACCOUNT: '+account+' CALL TYPE: '+callType+contextStr+profileStr+' NOTES: '+notes.slice(0,8000)+' Return: {"account_name":"","call_type":"","account_read":"2-3 sentence CSM reading of this account","sentiment":"positive|neutral|concerned|at-risk","sentiment_reason":"one sentence explaining the detected sentiment based on specific signals in the notes","opening_line":"the perfect first sentence to say when the call starts — tailored to the sentiment and account context. If at-risk: empathetic and direct. If positive: warm and forward-looking. If expansion: ambitious. Max 25 words.","timeline":[{"date":"","type":"call|email|ticket|commitment|win|risk","title":"max 6 words","detail":"one sentence","flag":"open_commitment|risk|win|neutral"}],"open_commitments":[{"what":"","promised_on":"","promised_by":"CSM|client|unknown","status":"overdue|pending|unclear","urgency":"high|medium|low"}],"risk_signals":[{"signal":"","why_it_matters":"one sentence"}],"questions_to_ask":[{"question":"","why":""}],"dont_forget":"most important thing for this call"}';
     const data = await groqCall(p1, 2000);
     if (data.error) throw new Error(data.error);
 
