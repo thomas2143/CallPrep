@@ -399,7 +399,7 @@ textarea::placeholder{color:var(--text-3);font-style:italic;font-family:var(--fo
       <div class="ob-steps">
         <div class="ob-step-item">
           <div class="ob-step-num">💾</div>
-          <div class="ob-step-text">Notes saved in your browser — nothing leaves your device.</div>
+          <div class="ob-step-text">Sign in to save your accounts across devices — or use without an account, notes stay in your browser.</div>
         </div>
         <div class="ob-step-item">
           <div class="ob-step-num">📈</div>
@@ -444,6 +444,7 @@ textarea::placeholder{color:var(--text-3);font-style:italic;font-family:var(--fo
       <div id="header-user-info" style="display:none;align-items:center;gap:8px;">
         <span class="user-email" id="user-email-display"></span>
         <span class="user-plan" id="user-plan-badge">Free</span>
+        <button onclick="openProfileModal()" style="font-size:11px;padding:2px 8px;border-radius:var(--radius-sm);border:1px solid var(--border);background:transparent;color:var(--text-3);cursor:pointer;font-family:var(--font-heading);transition:all .15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-3)'">⚙ Profile</button>
       </div>
       <button class="logout-btn" id="logout-btn" onclick="signOut()" style="display:none;">Sign out</button>
       <button class="login-btn" id="login-btn" onclick="openAuthModal()">Sign in</button>
@@ -461,8 +462,8 @@ textarea::placeholder{color:var(--text-3);font-style:italic;font-family:var(--fo
         Weekly watchlist
       </div>
       <div style="display:flex;gap:8px;">
-        <button class="watchlist-refresh" onclick="generateWeeklyDebrief()" id="weekly-debrief-btn">📊 Weekly Debrief</button>
-        <button class="watchlist-refresh" onclick="buildWatchlist()">↻ Refresh</button>
+        <button class="watchlist-refresh" onclick="generateWeeklyDebrief()" id="weekly-debrief-btn" style="background:linear-gradient(135deg,#6366f1,#3b82f6);color:white;border:none;">📊 Weekly Debrief</button>
+        <button class="watchlist-refresh" onclick="buildWatchlist()" style="background:linear-gradient(135deg,#6366f1,#3b82f6);color:white;border:none;">↻ Refresh</button>
       </div>
     </div>
     <div id="watchlist-body">
@@ -521,7 +522,7 @@ textarea::placeholder{color:var(--text-3);font-style:italic;font-family:var(--fo
     <div style="display:flex;flex-direction:column;flex:1;min-height:160px;overflow:hidden;">
       <div class="notes-label-row">
         <div style="display:flex;align-items:center;gap:8px;">
-          <div class="section-label" style="margin-bottom:0;">Your notes</div>
+          <div class="section-label" style="margin-bottom:0;font-size:12px;letter-spacing:1px;background:linear-gradient(135deg,#6366f1,#3b82f6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Your notes</div>
           <span onclick="togglePasteTip()" style="font-size:11px;color:var(--accent);cursor:pointer;font-family:var(--font-heading);border-bottom:1px dashed var(--accent-border);">what to paste?</span>
         </div>
         <div class="notes-actions">
@@ -548,7 +549,7 @@ The AI handles the mess — that's the point."
       ></textarea>
       <div style="font-size:11px;color:var(--text-3);margin-top:6px;display:flex;align-items:center;gap:5px;">
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        Your notes never leave your browser — paste freely, nothing is stored on our servers.
+        <span id="security-note">Your notes never leave your browser — paste freely, nothing is stored on our servers.</span>
       </div>
       <div class="prep-score-bar" id="prep-score-bar" style="display:none;">
         <div class="prep-score-top">
@@ -612,8 +613,8 @@ The AI handles the mess — that's the point."
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:100%;max-width:580px;margin-bottom:28px;">
         <div style="background:var(--green-bg);border:1px solid var(--green-border);border-radius:var(--radius);padding:20px 16px;text-align:center;">
           <div style="font-size:24px;margin-bottom:10px;">🔴</div>
-          <div style="font-family:var(--font-heading);font-size:13px;font-weight:600;color:var(--green-text);margin-bottom:6px;">1. Demo loaded</div>
-          <div style="font-size:12px;color:var(--text-2);line-height:1.5;">Nova Corp is pre-loaded on the left — an at-risk account</div>
+          <div style="font-family:var(--font-heading);font-size:13px;font-weight:600;color:var(--green-text);margin-bottom:6px;">1. Demo scenarios</div>
+          <div style="font-size:12px;color:var(--text-2);line-height:1.5;">Demo scenarios are pre-loaded on the bottom left to guide you</div>
         </div>
         <div style="background:var(--accent-light);border:1px solid var(--accent-border);border-radius:var(--radius);padding:20px 16px;text-align:center;">
           <div style="font-size:24px;margin-bottom:10px;">✦</div>
@@ -920,10 +921,14 @@ function updateHeaderUI() {
     updateBriefCounter();
     loadAccountsFromCloud();
     var saveBtn = document.getElementById("save-account-btn");
-    // Show profile modal if never filled
+    var secNote = document.getElementById("security-note");
+    if (secNote) secNote.textContent = "Your notes are saved securely to your account — accessible on any device.";
+    // Show profile modal only on first signup
     setTimeout(function() {
       loadProfileFromStorage();
-      if (!csProfile.role && !localStorage.getItem("debrief_profile_skipped")) {
+      var isNewSignup = localStorage.getItem("debrief_new_signup");
+      if (isNewSignup && !csProfile.role) {
+        localStorage.removeItem("debrief_new_signup");
         openProfileModal();
       }
     }, 1500);
@@ -954,11 +959,19 @@ async function authSubmit() {
   btn.textContent = "Loading..."; btn.disabled = true;
   var result = _authMode === "login" ? await _supabase.auth.signInWithPassword({ email: email, password: password }) : await _supabase.auth.signUp({ email: email, password: password });
   if (result.error) { errEl.textContent = result.error.message; errEl.classList.add("visible"); }
-  else { closeAuthModal(); }
+  else {
+    if (_authMode === "signup") localStorage.setItem("debrief_new_signup", "1");
+    closeAuthModal();
+  }
   btn.textContent = _authMode === "login" ? "Sign in" : "Create account"; btn.disabled = false;
 }
 
-async function signOut() { if (_supabase) await _supabase.auth.signOut(); currentUser = null; currentPlan = "free"; updateHeaderUI(); }
+async function signOut() {
+  if (_supabase) await _supabase.auth.signOut();
+  currentUser = null; currentPlan = "free"; updateHeaderUI();
+  var secNote = document.getElementById("security-note");
+  if (secNote) secNote.textContent = "Your notes never leave your browser — paste freely, nothing is stored on our servers.";
+}
 
 function canGenerateBrief() {
   if (!currentUser) return true;
