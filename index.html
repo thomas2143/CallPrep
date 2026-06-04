@@ -1014,8 +1014,12 @@ function updateBriefCounter() {
 }
 
 // -- CLOUD SYNC --
+var DEMO_ACCOUNTS = ["nova corp", "orbit analytics", "brightfield co"];
+
 async function saveAccountToCloud(name, callType, lastContext, sessions) {
   if (!_supabase || !currentUser) return;
+  // Never save demo accounts to cloud
+  if (DEMO_ACCOUNTS.indexOf(name.toLowerCase()) !== -1) return;
   try {
     var existing = await _supabase.from("accounts").select("id").eq("user_id", currentUser.id).eq("name", name).maybeSingle();
     var accountId;
@@ -1044,6 +1048,8 @@ async function loadAccountsFromCloud() {
     for (var i = 0; i < result.data.length; i++) {
       var acc = result.data[i];
       var key = acc.name.toLowerCase();
+      // Never overwrite demo accounts from cloud
+      if (DEMO_ACCOUNTS.indexOf(key) !== -1) continue;
       if (!local[key]) {
         var sessResult = await _supabase.from("sessions").select("*").eq("account_id", acc.id);
         local[key] = {
