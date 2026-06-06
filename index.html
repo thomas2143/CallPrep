@@ -1133,7 +1133,13 @@ function getProfileContext() {
   if (csProfile.focus) parts.push("Primary focus: " + csProfile.focus);
   if (csProfile.style) parts.push("Communication style: " + csProfile.style);
   if (parts.length === 0) return "";
-  return "\n\nCSM PROFILE (adapt the brief to this person): " + parts.join(", ") + ".";
+  return "\n\nCSM PROFILE — use this to personalize tone and questions only: " + parts.join(", ") + ". " +
+    "CRITICAL: The profile influences ONLY (1) the tone and style of opening_line and account_read, and (2) the angle of questions_to_ask. " +
+    "The profile NEVER overrides what is in the notes. " +
+    "Timeline, risk_signals, open_commitments, sentiment and dont_forget must always reflect the actual notes — not the CSM profile. " +
+    "If the notes talk about expansion, surface expansion signals even if the CSM focus is NRR. " +
+    "If the notes show a healthy account, do not invent risks because the CSM focuses on churn prevention. " +
+    "The notes are the source of truth. The profile only shapes how you communicate what the notes reveal.";
 }
 
 // -- HEALTH SCORE --
