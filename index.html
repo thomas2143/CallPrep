@@ -763,7 +763,7 @@ Example:
       </svg>
       <div class="auth-title" id="auth-title">Sign in to Debrief</div>
     </div>
-    <div class="auth-sub" id="auth-sub">Save your accounts across devices. Free plan: 5 briefs/month.</div>
+    <div class="auth-sub" id="auth-sub">Save your accounts across devices. Free plan: 10 briefs/month.</div>
     <div class="auth-error" id="auth-error"></div>
     <input class="auth-input" type="email" id="auth-email" placeholder="your@email.com" />
     <input class="auth-input" type="password" id="auth-password" placeholder="Password (min 6 characters)" />
@@ -944,7 +944,7 @@ function closeAuthModal() { document.getElementById("auth-modal").classList.add(
 function toggleAuthMode() {
   _authMode = _authMode === "login" ? "signup" : "login";
   document.getElementById("auth-title").textContent = _authMode === "login" ? "Sign in to Debrief" : "Create your account";
-  document.getElementById("auth-sub").textContent = _authMode === "login" ? "Welcome back." : "Free plan: 5 briefs/month.";
+  document.getElementById("auth-sub").textContent = _authMode === "login" ? "Welcome back." : "Free plan: 10 briefs/month.";
   document.getElementById("auth-submit-btn").textContent = _authMode === "login" ? "Sign in" : "Create account";
   document.getElementById("auth-toggle").innerHTML = _authMode === "login" ? "No account? <span onclick=\"toggleAuthMode()\">Create one free</span>" : "Already have an account? <span onclick=\"toggleAuthMode()\">Sign in</span>";
   document.getElementById("auth-error").classList.remove("visible");
