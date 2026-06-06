@@ -355,6 +355,12 @@ textarea::placeholder{color:var(--text-3);font-style:italic;font-family:var(--fo
 .profile-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:36px 40px;max-width:480px;width:100%;box-shadow:0 24px 64px rgba(0,0,0,.6);}
 .profile-select{font-family:var(--font-body);font-size:13px;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);background:var(--surface-2);outline:none;width:100%;margin-bottom:12px;cursor:pointer;}
 .profile-select:focus{border-color:var(--accent);}
+
+/* TOOLTIP */
+.hs-tooltip{position:relative;display:inline-flex;align-items:center;cursor:help;}
+.hs-tooltip .hs-tip{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--surface-3);border:1px solid var(--border-2);border-radius:var(--radius-sm);padding:6px 10px;font-size:11px;font-family:var(--font-heading);color:var(--text-2);white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .2s;z-index:50;}
+.hs-tooltip .hs-tip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:4px solid transparent;border-top-color:var(--border-2);}
+.hs-tooltip:hover .hs-tip{opacity:1;}
 </style>
 </head>
 <body>
@@ -901,8 +907,20 @@ async function initAuth() {
 async function loadProfile() {
   if (!_supabase || !currentUser) return;
   var r = await _supabase.from("profiles").select("*").eq("id", currentUser.id).maybeSingle();
-  if (r.data) { currentPlan = r.data.plan || "free"; briefsUsedThisMonth = r.data.briefs_count || 0; }
-  else { await _supabase.from("profiles").insert({ id: currentUser.id, email: currentUser.email, plan: "free", briefs_count: 0 }); }
+  if (r.data) {
+    currentPlan = r.data.plan || "free";
+    briefsUsedThisMonth = r.data.briefs_count || 0;
+    // Load CSM profile from Supabase into localStorage
+    if (r.data.role_title || r.data.industry || r.data.cs_focus || r.data.communication_style) {
+      csProfile.role = r.data.role_title || "";
+      csProfile.industry = r.data.industry || "";
+      csProfile.focus = r.data.cs_focus || "";
+      csProfile.style = r.data.communication_style || "";
+      localStorage.setItem("debrief_cs_profile", JSON.stringify(csProfile));
+    }
+  } else {
+    await _supabase.from("profiles").insert({ id: currentUser.id, email: currentUser.email, plan: "free", briefs_count: 0 });
+  }
 }
 
 function updateHeaderUI() {
@@ -1072,6 +1090,11 @@ async function loadAccountsFromCloud() {
 var csProfile = { role: "", industry: "", focus: "", style: "" };
 
 function openProfileModal() {
+  loadProfileFromStorage();
+  if (csProfile.role) document.getElementById("p-role").value = csProfile.role;
+  if (csProfile.industry) document.getElementById("p-industry").value = csProfile.industry;
+  if (csProfile.focus) document.getElementById("p-focus").value = csProfile.focus;
+  if (csProfile.style) document.getElementById("p-style").value = csProfile.style;
   document.getElementById("profile-modal").classList.remove("hidden");
 }
 function closeProfileModal() {
@@ -1571,11 +1594,19 @@ async function generate() {
     accountEl.innerHTML = '';
     var nameSpan = document.createElement('span');
     nameSpan.textContent = data.account_name || account || 'Account';
+    var tooltipWrap = document.createElement('span');
+    tooltipWrap.className = 'hs-tooltip';
+    tooltipWrap.style.cssText = 'margin-left:12px;';
     var scoreSpan = document.createElement('span');
     scoreSpan.textContent = healthEmoji + ' ' + healthScore;
-    scoreSpan.style.cssText = 'font-size:18px;font-weight:700;color:' + healthColor + ';margin-left:12px;';
+    scoreSpan.style.cssText = 'font-size:18px;font-weight:700;color:' + healthColor + ';';
+    var tipSpan = document.createElement('span');
+    tipSpan.className = 'hs-tip';
+    tipSpan.textContent = 'Health Score — based on sentiment, open commitments and risk signals';
+    tooltipWrap.appendChild(scoreSpan);
+    tooltipWrap.appendChild(tipSpan);
     accountEl.appendChild(nameSpan);
-    accountEl.appendChild(scoreSpan);
+    accountEl.appendChild(tooltipWrap);
 
     document.getElementById('out-meta').textContent = (data.call_type || callType) + ' · Pre-call brief · ' + new Date().toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'});
     document.getElementById('out-read').textContent = data.account_read || '';
