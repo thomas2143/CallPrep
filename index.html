@@ -1197,12 +1197,12 @@ function updateSecurityNote() {
 }
 
 
-var GROQ_KEY = "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";
+var GROQ_KEY = "";
 
 async function groqCall(prompt, maxTokens) {
-  var r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+  var r = await fetch('/api/groq', {
     method: 'POST',
-    headers: {'Content-Type':'application/json','Authorization':'Bearer '+GROQ_KEY},
+    headers: {'Content-Type':'application/json'},
     body: JSON.stringify({model:'llama-3.3-70b-versatile',max_tokens:maxTokens||2000,temperature:0.1,messages:[{role:'user',content:prompt}]})
   });
   var j = await r.json();
@@ -2128,9 +2128,9 @@ async function generateWeeklyDebrief() {
   var prompt = "You are a senior Customer Success Manager reviewing your week. Today is " + today + ". The week started " + weekStartStr + ".\n\nHere are all your accounts and their notes:\n\n" + accountSummaries.join("\n\n---\n\n") + "\n\nGenerate a professional weekly debrief report. Structure it as follows:\n\n# Weekly CS Debrief — " + today + "\n\n## This Week At a Glance\n[2-3 sentence summary of the week]\n\n## Accounts Requiring Immediate Attention\n[List accounts with urgent signals — renewal risk, overdue commitments, silent clients]\n\n## Wins This Week\n[Positive signals, progress made, commitments kept]\n\n## Open Commitments to Follow Up\n[List all unresolved commitments across accounts]\n\n## Looking Ahead — Next Week Priorities\n[Top 3 actions to take next week]\n\nBe specific. Reference actual account names and situations from the notes. Write as if you are the CSM reflecting on their own week.";
 
   try {
-    var j = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    var j = await fetch("/api/groq", {
       method: "POST",
-      headers: {"Content-Type":"application/json","Authorization":"Bearer " + GROQ_KEY},
+      headers: {"Content-Type":"application/json"},
       body: JSON.stringify({model:"llama-3.3-70b-versatile", max_tokens:1500, temperature:0.2, messages:[{role:"user",content:prompt}]})
     });
     var data = await j.json();
