@@ -1,11 +1,9 @@
-export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+import { guard, parseModelJson, MODEL } from '../lib/guard.js';
 
-  const { transcript, account } = req.body;
+export default async function handler(req, res) {
+  if (await guard(req, res)) return;
+
+  const { transcript, account } = req.body || {};
   if (!transcript) return res.status(400).json({ error: 'Missing transcript' });
 
   const apiKey = process.env.GROQ_API_KEY;
@@ -14,7 +12,7 @@ export default async function handler(req, res) {
   const prompt = `You are a senior CSM summarizing a client call transcript for ${account || 'a client'}.
 
 TRANSCRIPT:
-${transcript.slice(0, 8000)}
+${String(transcript).slice(0, 8000)}
 
 Extract the key information and return ONLY valid JSON, no markdown, no backticks:
 {
@@ -29,28 +27,24 @@ Extract the key information and return ONLY valid JSON, no markdown, no backtick
   try {
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
       body: JSON.stringify({
-        model: 'openai/gpt-oss-120b',
+        model: MODEL,
         max_tokens: 800,
         temperature: 0.2,
         messages: [{ role: 'user', content: prompt }]
       })
     });
-    const data = await response.json();
-    const text = data.choices?.[0]?.message?.content || '';
-    const clean = text.replace(/```json|```/g, '').trim();
-    let parsed;
-    try { parsed = JSON.parse(clean); }
-    catch(e) {
-      const opens = (clean.match(/\{/g)||[]).length;
-      const closes = (clean.match(/\}/g)||[]).length;
-      let rec = clean.replace(/,\s*\]/g,']').replace(/,\s*\}/g,'}');
-      for(let i=0;i<opens-closes;i++) rec+='}';
-      parsed = JSON.parse(rec);
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      return res.status(response.status).json({ error: err.error?.message || 'Groq API error' });
     }
+
+    const data = await response.json();
+    const parsed = parseModelJson(data.choices?.[0]?.message?.content);
     return res.status(200).json(parsed);
-  } catch(e) {
+  } catch (e) {
     return res.status(500).json({ error: e.message });
   }
 }
