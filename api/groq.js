@@ -3,7 +3,7 @@ const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
 
 const ALLOWED_MODELS = ['openai/gpt-oss-120b'];
-const MAX_TOKENS_CAP = 2000;
+const MAX_TOKENS_CAP = 4000;
 const MAX_PROMPT_CHARS = 12000;
 
 export default async function handler(req, res) {
