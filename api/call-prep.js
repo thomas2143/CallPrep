@@ -8,8 +8,8 @@ export default async function handler(req, res) {
   const { notes, account, callType, mode } = req.body;
   if (!notes) return res.status(400).json({ error: 'Missing notes' });
 
-  const apiKey = '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';
-
+  const apiKey = process.env.GROQ_API_KEY;
+  if (!apiKey) return res.status(500).json({ error: 'API key not configured' });
   const prompt = `You are a senior Customer Success Manager. Analyze the notes and return ONLY valid JSON, no markdown, no backticks, no extra text.
 
 ACCOUNT: ${account || 'Unknown'}
