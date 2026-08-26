@@ -1179,12 +1179,11 @@ function openUpgrade() {
 if (window.location.search.includes("upgraded=true")) {
   setTimeout(async function() {
     if (_supabase && currentUser) {
-      await _supabase.from("profiles").update({ plan: "pro", briefs_count: 0 }).eq("id", currentUser.id);
-      currentPlan = "pro"; updateHeaderUI();
-      alert("Welcome to Debrief Pro! Unlimited briefs unlocked.");
+      await loadProfile();
+      updateHeaderUI();
       window.history.replaceState({}, "", window.location.pathname);
     }
-  }, 1000);
+  }, 3000);
 }
 
 initAuth();
@@ -1197,13 +1196,19 @@ function updateSecurityNote() {
 }
 
 
-var GROQ_KEY = "";
+async function getAccessToken() {
+  if (!_supabase) return null;
+  var sess = await _supabase.auth.getSession();
+  return sess && sess.data && sess.data.session ? sess.data.session.access_token : null;
+}
 
 async function groqCall(prompt, maxTokens) {
+  var token = await getAccessToken();
+  if (!token) { openAuthModal(); throw new Error('Not authenticated'); }
   var r = await fetch('/api/groq', {
     method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({model:'llama-3.3-70b-versatile',max_tokens:maxTokens||2000,temperature:0.1,messages:[{role:'user',content:prompt}]})
+    headers: {'Content-Type':'application/json','Authorization':'Bearer '+token},
+    body: JSON.stringify({model:'openai/gpt-oss-120b',max_tokens:maxTokens||2000,temperature:0.1,messages:[{role:'user',content:prompt}]})
   });
   var j = await r.json();
   var t = j.choices&&j.choices[0]?j.choices[0].message.content:'';
@@ -2128,10 +2133,12 @@ async function generateWeeklyDebrief() {
   var prompt = "You are a senior Customer Success Manager reviewing your week. Today is " + today + ". The week started " + weekStartStr + ".\n\nHere are all your accounts and their notes:\n\n" + accountSummaries.join("\n\n---\n\n") + "\n\nGenerate a professional weekly debrief report. Structure it as follows:\n\n# Weekly CS Debrief — " + today + "\n\n## This Week At a Glance\n[2-3 sentence summary of the week]\n\n## Accounts Requiring Immediate Attention\n[List accounts with urgent signals — renewal risk, overdue commitments, silent clients]\n\n## Wins This Week\n[Positive signals, progress made, commitments kept]\n\n## Open Commitments to Follow Up\n[List all unresolved commitments across accounts]\n\n## Looking Ahead — Next Week Priorities\n[Top 3 actions to take next week]\n\nBe specific. Reference actual account names and situations from the notes. Write as if you are the CSM reflecting on their own week.";
 
   try {
+    var wToken = await getAccessToken();
+    if (!wToken) { openAuthModal(); btn.textContent = origText; btn.disabled = false; return; }
     var j = await fetch("/api/groq", {
       method: "POST",
-      headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({model:"llama-3.3-70b-versatile", max_tokens:1500, temperature:0.2, messages:[{role:"user",content:prompt}]})
+      headers: {"Content-Type":"application/json","Authorization":"Bearer "+wToken},
+      body: JSON.stringify({model:"openai/gpt-oss-120b", max_tokens:1500, temperature:0.2, messages:[{role:"user",content:prompt}]})
     });
     var data = await j.json();
     var text = data.choices && data.choices[0] ? data.choices[0].message.content : "Could not generate debrief.";
