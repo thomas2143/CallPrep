@@ -1,11 +1,9 @@
-export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+import { guard, parseModelJson, MODEL } from '../lib/guard.js';
 
-  const { accountSummaries, today } = req.body;
+export default async function handler(req, res) {
+  if (await guard(req, res)) return;
+
+  const { accountSummaries, today } = req.body || {};
   if (!accountSummaries) return res.status(400).json({ error: 'Missing account data' });
 
   const apiKey = process.env.GROQ_API_KEY;
@@ -13,7 +11,7 @@ export default async function handler(req, res) {
 
   const prompt = `You are a senior CSM analyzing a portfolio of accounts. Based on the notes below, identify which accounts need attention THIS WEEK and why.
 
-${accountSummaries.slice(0, 10000)}
+${String(accountSummaries).slice(0, 10000)}
 
 Today is ${today}.
 
@@ -33,10 +31,10 @@ Rules:
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
+        Authorization: `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: 'openai/gpt-oss-120b',
+        model: MODEL,
         max_tokens: 1000,
         temperature: 0.1,
         messages: [{ role: 'user', content: prompt }]
@@ -49,25 +47,9 @@ Rules:
     }
 
     const data = await response.json();
-    const text = data.choices?.[0]?.message?.content || '';
-    const clean = text.replace(/```json|```/g, '').trim();
-
-    let parsed;
-    try {
-      parsed = JSON.parse(clean);
-    } catch(e) {
-      const opens = (clean.match(/\{/g) || []).length;
-      const closes = (clean.match(/\}/g) || []).length;
-      const arrOpens = (clean.match(/\[/g) || []).length;
-      const arrCloses = (clean.match(/\]/g) || []).length;
-      let recovered = clean.replace(/,\s*\]/g, ']').replace(/,\s*\}/g, '}');
-      for (let i = 0; i < arrOpens - arrCloses; i++) recovered += ']';
-      for (let i = 0; i < opens - closes; i++) recovered += '}';
-      parsed = JSON.parse(recovered);
-    }
-
+    const parsed = parseModelJson(data.choices?.[0]?.message?.content);
     return res.status(200).json(parsed);
-  } catch(e) {
+  } catch (e) {
     return res.status(500).json({ error: e.message || 'Something went wrong' });
   }
 }
