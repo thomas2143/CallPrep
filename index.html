@@ -1254,7 +1254,7 @@ async function groqCall(prompt, maxTokens) {
   var r = await fetch('/api/groq', {
     method: 'POST',
     headers: headers,
-    body: JSON.stringify({model:'openai/gpt-oss-120b',max_tokens:maxTokens||2000,temperature:0.1,messages:[{role:'user',content:prompt}]})
+    body: JSON.stringify({model:'openai/gpt-oss-120b',max_tokens:maxTokens||4000,temperature:0.1,messages:[{role:'user',content:prompt}]})
   });
   if (!r.ok) {
     var errBody = await r.json().catch(function(){return {};});
@@ -1262,10 +1262,12 @@ async function groqCall(prompt, maxTokens) {
     throw new Error(errBody.error || ('Request failed ('+r.status+')'));
   }
   var j = await r.json();
-  var t = j.choices&&j.choices[0]?j.choices[0].message.content:'';
+  var t = j.choices&&j.choices[0]&&j.choices[0].message ? (j.choices[0].message.content||'') : '';
   var c = t.replace(/```json|```/g,'').trim();
+  if (!c) throw new Error('The model returned an empty response. Try again with shorter notes.');
   try{return JSON.parse(c);}catch(e){
-    return JSON.parse(repairTruncatedJson(c));
+    try{ return JSON.parse(repairTruncatedJson(c)); }
+    catch(e2){ throw new Error('Could not read the model output. Try again.'); }
   }
 }
 
@@ -1641,7 +1643,7 @@ async function generate() {
     var contextStr = context ? ' ADDITIONAL CONTEXT: '+context : '';
     var profileStr = getProfileContext();
     var p1 = 'You are a senior CSM. Analyze notes and return ONLY valid JSON no markdown. ACCOUNT: '+account+' CALL TYPE: '+callType+contextStr+profileStr+' NOTES: '+notes.slice(0,8000)+' Return: {"account_name":"","call_type":"","account_read":"2-3 sentence CSM reading of this account","sentiment":"positive|neutral|concerned|at-risk","sentiment_reason":"one sentence explaining the detected sentiment based on specific signals in the notes","opening_line":"the perfect first sentence to say when the call starts — tailored to the sentiment and account context. If at-risk: empathetic and direct. If positive: warm and forward-looking. If expansion: ambitious. Max 25 words.","timeline":[{"date":"","type":"call|email|ticket|commitment|win|risk","title":"max 6 words","detail":"one sentence","flag":"open_commitment|risk|win|neutral"}],"open_commitments":[{"what":"","promised_on":"","promised_by":"CSM|client|unknown","status":"overdue|pending|unclear","urgency":"high|medium|low"}],"risk_signals":[{"signal":"","why_it_matters":"one sentence"}],"questions_to_ask":[{"question":"","why":""}],"dont_forget":"most important thing for this call"}';
-    const data = await groqCall(p1, 2000);
+    const data = await groqCall(p1, 4000);
     if (data.error) throw new Error(data.error);
 
     // Header
@@ -2186,7 +2188,7 @@ async function generateWeeklyDebrief() {
     var j = await fetch("/api/groq", {
       method: "POST",
       headers: {"Content-Type":"application/json","Authorization":"Bearer "+wToken},
-      body: JSON.stringify({model:"openai/gpt-oss-120b", max_tokens:1500, temperature:0.2, messages:[{role:"user",content:prompt}]})
+      body: JSON.stringify({model:"openai/gpt-oss-120b", max_tokens:4000, temperature:0.2, messages:[{role:"user",content:prompt}]})
     });
     var data = await j.json();
     var text = data.choices && data.choices[0] ? data.choices[0].message.content : "Could not generate debrief.";
