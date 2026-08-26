@@ -3,7 +3,8 @@ const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
 
 const ALLOWED_MODELS = ['openai/gpt-oss-120b'];
-const MAX_TOKENS_CAP = 4000;
+const MAX_TOKENS_CAP = 8000;
+const MIN_TOKENS = 4000;
 const MAX_PROMPT_CHARS = 12000;
 const ANON_LIMIT = 10;
 const ANON_WINDOW_MS = 30 * 24 * 60 * 60 * 1000; // 30 jours
@@ -24,6 +25,34 @@ function checkAnonRateLimit(ip) {
   if (entry.count >= ANON_LIMIT) return false;
   entry.count++;
   return true;
+}
+
+// gpt-oss-120b est un modèle de raisonnement : ses tokens de raisonnement
+// consomment le budget max_tokens et arrivent dans un champ `reasoning`
+// distinct. Sans ces deux réglages, un prompt long épuise le budget en
+// raisonnant et `content` revient vide (finish_reason: "length").
+function buildPayload({ model, max_tokens, temperature, messages }) {
+  return {
+    model: ALLOWED_MODELS.includes(model) ? model : ALLOWED_MODELS[0],
+    max_tokens: Math.min(Math.max(Number(max_tokens) || MIN_TOKENS, MIN_TOKENS), MAX_TOKENS_CAP),
+    temperature: Number.isFinite(Number(temperature)) ? Number(temperature) : 0.1,
+    reasoning_effort: 'low',
+    include_reasoning: false,
+    messages: messages.map(m => ({ role: m.role, content: String(m.content || '') }))
+  };
+}
+
+async function callGroq(apiKey, payload) {
+  const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${apiKey}`
+    },
+    body: JSON.stringify(payload)
+  });
+  const data = await response.json();
+  return { response, data };
 }
 
 export default async function handler(req, res) {
@@ -68,30 +97,43 @@ export default async function handler(req, res) {
     return res.status(413).json({ error: 'Prompt too large' });
   }
 
-  const safeModel = ALLOWED_MODELS.includes(model) ? model : ALLOWED_MODELS[0];
-  const safeTokens = Math.min(Number(max_tokens) || 1000, MAX_TOKENS_CAP);
-  const safeTemp = Number.isFinite(Number(temperature)) ? Number(temperature) : 0.1;
-
   const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'API key not configured' });
 
-  try {
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model: safeModel,
-        max_tokens: safeTokens,
-        temperature: safeTemp,
-        messages: messages.map(m => ({ role: m.role, content: String(m.content || '') }))
-      })
-    });
+  const payload = buildPayload({ model, max_tokens, temperature, messages });
 
-    const data = await response.json();
-    return res.status(response.status).json(data);
+  try {
+    let { response, data } = await callGroq(apiKey, payload);
+
+    if (!response.ok) {
+      return res.status(response.status).json({
+        error: data?.error?.message || 'Groq API error'
+      });
+    }
+
+    let choice = data.choices?.[0];
+    let content = choice?.message?.content || '';
+
+    // Le raisonnement a mangé tout le budget : une seule relance, plafond haut.
+    if (!content.trim() && choice?.finish_reason === 'length') {
+      const retry = await callGroq(apiKey, {
+        ...payload,
+        max_tokens: MAX_TOKENS_CAP
+      });
+      if (retry.response.ok) {
+        choice = retry.data.choices?.[0];
+        content = choice?.message?.content || '';
+        data = retry.data;
+      }
+    }
+
+    if (!content.trim()) {
+      return res.status(502).json({
+        error: 'Model returned no content (finish_reason: ' + (choice?.finish_reason || 'unknown') + '). Try shorter notes.'
+      });
+    }
+
+    return res.status(200).json(data);
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
