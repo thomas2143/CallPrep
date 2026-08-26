@@ -898,6 +898,7 @@ async function initAuth() {
   var res = await _supabase.auth.getSession();
   var session = res.data && res.data.session ? res.data.session : null;
   if (session && session.user) { currentUser = session.user; await loadProfile(); updateHeaderUI(); }
+  else { updateBriefCounter(); }
   _supabase.auth.onAuthStateChange(async function(event, session) {
     if (session && session.user) { currentUser = session.user; await loadProfile(); updateHeaderUI(); }
     else { currentUser = null; currentPlan = "free"; updateHeaderUI(); }
@@ -992,13 +993,32 @@ async function signOut() {
 }
 
 function canGenerateBrief() {
-  if (!currentUser) return true;
-  if (currentPlan === "pro") return true;
-  return briefsUsedThisMonth < FREE_BRIEF_LIMIT;
+  if (currentUser) {
+    if (currentPlan === "pro") return true;
+    return briefsUsedThisMonth < FREE_BRIEF_LIMIT;
+  }
+  return getAnonBriefCount() < FREE_BRIEF_LIMIT;
+}
+
+function _anonMonthKey() {
+  var d = new Date();
+  return d.getFullYear() + "-" + d.getMonth();
+}
+function getAnonBriefCount() {
+  var raw = localStorage.getItem("callprep_anon_usage");
+  var data = raw ? JSON.parse(raw) : null;
+  if (!data || data.month !== _anonMonthKey()) return 0;
+  return data.count || 0;
+}
+function incrementAnonBriefCount() {
+  var count = getAnonBriefCount() + 1;
+  localStorage.setItem("callprep_anon_usage", JSON.stringify({ month: _anonMonthKey(), count: count }));
+  return count;
 }
 
 async function incrementBriefCount() {
-  if (!_supabase || !currentUser) return;
+  if (!currentUser) { incrementAnonBriefCount(); updateBriefCounter(); return; }
+  if (!_supabase) return;
   briefsUsedThisMonth++;
   await _supabase.from("profiles").update({ briefs_count: briefsUsedThisMonth }).eq("id", currentUser.id);
   updateBriefCounter();
@@ -1008,7 +1028,15 @@ function updateBriefCounter() {
   var counter = document.getElementById("briefs-counter");
   if (!counter) return;
   if (!currentUser) {
-    counter.style.display = "none";
+    var remainingAnon = FREE_BRIEF_LIMIT - getAnonBriefCount();
+    counter.style.display = "block";
+    if (remainingAnon <= 0) {
+      counter.textContent = "Free briefs used — sign in to keep going";
+      counter.style.color = "var(--red-text)";
+    } else {
+      counter.textContent = remainingAnon + " of " + FREE_BRIEF_LIMIT + " free briefs remaining — no account needed";
+      counter.style.color = "var(--text-3)";
+    }
     return;
   }
   if (currentPlan === "pro") {
@@ -1202,22 +1230,42 @@ async function getAccessToken() {
   return sess && sess.data && sess.data.session ? sess.data.session.access_token : null;
 }
 
+function repairTruncatedJson(raw) {
+  var out = '', inStr = false, esc = false, stack = [];
+  for (var i = 0; i < raw.length; i++) {
+    var ch = raw[i];
+    out += ch;
+    if (esc) { esc = false; continue; }
+    if (ch === '\\' && inStr) { esc = true; continue; }
+    if (ch === '"') { inStr = !inStr; continue; }
+    if (inStr) continue;
+    if (ch === '{' || ch === '[') stack.push(ch);
+    else if (ch === '}' || ch === ']') stack.pop();
+  }
+  if (inStr) out += '"';
+  out = out.replace(/,\s*$/, '');
+  for (var j = stack.length - 1; j >= 0; j--) out += (stack[j] === '{' ? '}' : ']');
+  return out;
+}
 async function groqCall(prompt, maxTokens) {
   var token = await getAccessToken();
-  if (!token) { openAuthModal(); throw new Error('Not authenticated'); }
+  var headers = {'Content-Type':'application/json'};
+  if (token) headers.Authorization = 'Bearer '+token;
   var r = await fetch('/api/groq', {
     method: 'POST',
-    headers: {'Content-Type':'application/json','Authorization':'Bearer '+token},
+    headers: headers,
     body: JSON.stringify({model:'openai/gpt-oss-120b',max_tokens:maxTokens||2000,temperature:0.1,messages:[{role:'user',content:prompt}]})
   });
+  if (!r.ok) {
+    var errBody = await r.json().catch(function(){return {};});
+    if (r.status === 401) { openAuthModal(); }
+    throw new Error(errBody.error || ('Request failed ('+r.status+')'));
+  }
   var j = await r.json();
   var t = j.choices&&j.choices[0]?j.choices[0].message.content:'';
   var c = t.replace(/```json|```/g,'').trim();
   try{return JSON.parse(c);}catch(e){
-    var op=(c.match(/\{/g)||[]).length,cl=(c.match(/\}/g)||[]).length;
-    var rec=c.replace(/,\s*\]/g,']').replace(/,\s*\}/g,'}');
-    for(var i=0;i<op-cl;i++)rec+='}';
-    return JSON.parse(rec);
+    return JSON.parse(repairTruncatedJson(c));
   }
 }
 
