@@ -2,7 +2,7 @@ const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || '';
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
 
-const ALLOWED_MODELS = ['llama-3.3-70b-versatile'];
+const ALLOWED_MODELS = ['openai/gpt-oss-120b'];
 const MAX_TOKENS_CAP = 2000;
 const MAX_PROMPT_CHARS = 12000;
 
@@ -35,6 +35,7 @@ export default async function handler(req, res) {
   if (totalChars > MAX_PROMPT_CHARS) {
     return res.status(413).json({ error: 'Prompt too large' });
   }
+
   const safeModel = ALLOWED_MODELS.includes(model) ? model : ALLOWED_MODELS[0];
   const safeTokens = Math.min(Number(max_tokens) || 1000, MAX_TOKENS_CAP);
   const safeTemp = Number.isFinite(Number(temperature)) ? Number(temperature) : 0.1;
