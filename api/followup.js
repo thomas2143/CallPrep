@@ -25,7 +25,7 @@ Return ONLY valid JSON, no markdown, no backticks:
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
       body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
+        model: 'openai/gpt-oss-120b',
         max_tokens: 800,
         temperature: 0.3,
         messages: [{ role: 'user', content: prompt }]
@@ -34,7 +34,16 @@ Return ONLY valid JSON, no markdown, no backticks:
     const data = await response.json();
     const text = data.choices?.[0]?.message?.content || '';
     const clean = text.replace(/```json|```/g, '').trim();
-    const parsed = JSON.parse(clean);
+    let parsed;
+    try {
+      parsed = JSON.parse(clean);
+    } catch (e) {
+      const opens = (clean.match(/\{/g) || []).length;
+      const closes = (clean.match(/\}/g) || []).length;
+      let rec = clean.replace(/,\s*\]/g, ']').replace(/,\s*\}/g, '}');
+      for (let i = 0; i < opens - closes; i++) rec += '}';
+      parsed = JSON.parse(rec);
+    }
     return res.status(200).json(parsed);
   } catch(e) {
     return res.status(500).json({ error: e.message });
